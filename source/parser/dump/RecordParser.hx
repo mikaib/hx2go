@@ -15,6 +15,8 @@ typedef RecordSection = Map<String, Dynamic>;
 enum RecordEntryKind {
     RUnknown;
     RAbstract;
+    RType;
+    REnum;
     RClass;
 }
 /**
@@ -35,6 +37,8 @@ class RecordEntry {
     // specialised variants
     public function toClass(): RecordClass return cast (this, RecordClass);
     public function toAbstract(): RecordAbstract return cast (this, RecordAbstract);
+    public function toType():RecordType return cast (this, RecordType);
+    public function toEnum():RecordEnum return cast (this, RecordEnum);
 }
 
 @:structInit
@@ -48,6 +52,16 @@ class RecordClass extends RecordEntry {
     public var constructor: Null<String> = null;
     public var ordered_fields: Array<RecordClassField> = [];
     public var ordered_statics: Array<RecordClassField> = [];
+}
+
+@:structInit
+class RecordType extends RecordEntry {
+    public var type:String = "";
+}
+
+@:structInit
+class RecordEnum extends RecordEntry {
+
 }
 
 @:structInit
@@ -498,6 +512,9 @@ class RecordParser {
                 recordKind = RAbstract;
                 mapConcrete(block, RecordAbstract);
 
+            case _ if (block.exists("t_path")):
+                recordKind  = RType;
+                mapConcrete(block, RecordType);
             case _:
                 recordKind = RUnknown;
                 mapConcrete(block, RecordEntry);

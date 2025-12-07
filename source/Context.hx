@@ -84,7 +84,6 @@ class Context {
         // create go.mod
         if (!FileSystem.exists("go.mod"))
             Sys.command("go mod init hx2go");
-        trace(options.buildAfterCompilation);
         if (options.buildAfterCompilation) {
             Sys.command('go build .');
         }

@@ -45,9 +45,12 @@ function recordToHaxeTypeDefinition(record: RecordEntry):HaxeTypeDefinition {
             abs.impl;
             //abs.impl[0]
 
-        // TODO: enum
-        // TODO: typedef
+        case RType:
+            var t = record.toType();
+        case REnum:
+            var t = record.toEnum();
         case RUnknown:
+            trace(record.record_debug_path);
             trace('record_kind should not be unknown: ' + record.module);
     }
     return {

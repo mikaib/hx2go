@@ -14,11 +14,11 @@ class ExprParser {
     var lineIndex:Int = 0;
     var stringIndex:Int = 0;
     var lastHeader:Header = null;
-    var dbg_path:String = "";
+    var debug_path:String = "";
     var nonImpl: Array<String> = [];
 
-    public function new(dbg_path) {
-        this.dbg_path = dbg_path;
+    public function new(debug_path) {
+        this.debug_path = debug_path;
     }
 
     public function parse(lines:Array<String>):HaxeExpr {
@@ -38,8 +38,9 @@ class ExprParser {
             if (header == null)
                 break;
             headerMap[header.startIndex] = header;
-            if (headerMap.exists(header.startIndex - 1))
+            if (headerMap.exists(header.startIndex - 1)) {
                 headerMap[header.startIndex - 1].headers.push(header);
+            }
         }
         if (firstHeader == null) {
             trace("lines parsed:\n" + lines.join("\n"));
@@ -95,9 +96,12 @@ class ExprParser {
                         final len = header.dataLines[0].length - 1;
                         // space + "", end ""
                         EConst(CString(header.dataLines[0].substring(2, len)));
+                    case "Int":
+                        EConst(CInt(header.dataLines[0]));
+                    case "Float":
+                        EConst(CFloat(header.dataLines[0]));
                     default:
-                        trace("Const subType not implemented: |" + header.subType + "|");
-                        EConst(CString('#UNKNOWN_DEFTYPE(${header.defType}'));
+                        EConst(CIdent(header.dataLines[0]));
                 }
             case META:
                 return headerToExpr(header.headers[0]);
@@ -125,10 +129,15 @@ class ExprParser {
             case OBJDECL:
                 EObjectDecl([]);
             case VAR:
-                EVars([]);
+                final exprHeader = parseHeaderFromString(header.dataLines[0]);
+                EVars([{
+                    name: header.subType.substr(0, header.subType.indexOf("<")),
+                    expr: headerToExpr(exprHeader),
+                }]);
             case WHILE:
                 EWhile(headerToExpr(header.headers[0]), headerToExpr(header.headers[1]), false);
             case LOCAL:
+                header.defType = header.subType;
                 specialDef = Local;
                 null;
             case PARENTHESIS:
@@ -142,6 +151,14 @@ class ExprParser {
             t: header.defType,
             def: def,
             specialDef: specialDef,
+            remapTo: null,
+        };
+    }
+    function emptyExpr():HaxeExpr {
+        return {
+            def: EBlock([]),
+            t: "",
+            specialDef: null,
             remapTo: null,
         };
     }
@@ -175,6 +192,19 @@ class ExprParser {
             printHeader(subHeader, depth + 1);
         }
     }
+    function parseHeaderFromString(s:String):Header {
+        final headerEndIndex = s.lastIndexOf("]") + 1;
+        final headerString = s.substring(s.indexOf("[") + 1, headerEndIndex - 1);
+        final header = parseHeader(0, headerString);
+        // if there is one liner data, put it into data
+        if (headerEndIndex + 2 < s.length) {
+            // remove semicolon from end
+            var endString = removeSemicolonSuffix(s);
+            endString = s.substring(headerEndIndex + 1);
+            header.dataLines = [endString];
+        }
+        return header;
+    }
     function getHeader():Header {
         if (lineIndex >= lines.length)
             return null;
@@ -202,8 +232,11 @@ class ExprParser {
         final headerString = lines[lineIndex].substring(headerStartIndex, headerEndIndex);
         final header = parseHeader(headerStartIndex, headerString);
         // if there is one liner data, put it into data
-        if (lines[lineIndex].charAt(lines[lineIndex].length - 1) == ";") {
-            header.dataLines = [lines[lineIndex].substring(headerEndIndex + 1, lines[lineIndex].length - 1)];
+        if (headerEndIndex + 2 < lines[lineIndex].length) {
+            // remove semicolon from end
+            var endString = removeSemicolonSuffix(lines[lineIndex]);
+            endString = lines[lineIndex].substring(headerEndIndex + 1);
+            header.dataLines = [endString];
         }
         lastHeader = header;
         return header;
@@ -212,6 +245,13 @@ class ExprParser {
         lineIndex++;
         stringIndex = 0;
         return lineIndex < lines.length;
+    }
+    private inline function removeSemicolonSuffix(s:String):String {
+        if (s.charAt(s.length - 1) == ";") {
+            return s.substr(0, s.length - 1);
+        }else{
+            return s;
+        }
     }
     function parseHeader(startIndex:Int, headerString:String):Header {
         final colonIndex = headerString.indexOf(":", 1);

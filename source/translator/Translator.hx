@@ -20,9 +20,21 @@ class Translator {
                     FieldAccess.translateFieldAccess(this, e, field, kind);
                 case EConst(c):
                     Const.translateConst(this, c);
+                case EVars(vars):
+                    VarDeclarations.translateVarsDeclarations(this, vars);
+                case EBinop(op, e1, e2):
+                    BinopExpr.translateBinop(this, op, e1, e2);
                 default:
                     "_ = 0";
             }
+        if (e.specialDef != null) {
+            switch e.specialDef {
+                case Local:
+                    final ident = e.t.substr(0, e.t.indexOf("("));
+                   return SpecialLocal.translateSpecialLocal(this, ident);
+                default:
+            }
+        }
         return "";
     }
     public function translateDef(def:HaxeTypeDefinition):String {

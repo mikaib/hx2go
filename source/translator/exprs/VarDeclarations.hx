@@ -6,5 +6,7 @@ import HaxeExpr;
     Variable declarations.
 **/
 function translateVarsDeclarations(t:Translator, vars:Array<HaxeVar>) {
-
+    return vars.map(v -> {
+        "var " + v.name + " = " + t.translateExpr(v.expr) + "\n_ = " + v.name;
+    }).join("\n");
 } 

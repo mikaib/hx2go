@@ -4,7 +4,7 @@
 @:go.native("fmt")
 extern class Fmt {
     @:go.native("Println")
-	public static function println(s: String):Void;
+	public static function println(e:haxe.Rest<Dynamic>):Void;
 }
 
 // transformer -> goImports: ['fmt'] addModule(name: String): Void;
@@ -21,7 +21,7 @@ extern class Fmt {
 // go.Fmt
 class Test {
     public static function main() {
-        Fmt.println("hello"); // fmt.Println("hello");
-        // haxe.ds.Vector.fromArrayCopy([]);
+        var x = 10, y = 12;
+        Fmt.println("hello", 20 + x);
     }
 }
