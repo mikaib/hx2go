@@ -47,7 +47,7 @@ class ExprParser {
             }
         }
         if (firstObject == null) {
-            trace("lines parsed:\n" + lines.join("\n"));
+            // trace("lines parsed:\n" + lines.join("\n"));
             throw "first object not parsed";
         }
         printObject(firstObject);
@@ -79,16 +79,16 @@ class ExprParser {
             case BLOCK:
                 EBlock(object.objects.map(object -> objectToExpr(object)));
             case CALL:
-                trace(object.objects.length);
+                // trace(object.objects.length);
                 if (object.objects.length == 0) {
-                    trace(debug_path);
-                    trace(object.string());
+                    // trace(debug_path);
+                    // trace(object.string());
                 }
                 ECall(objectToExpr(object.objects[0]), object.objects.slice(1).map(object -> objectToExpr(object)));
             case FIELD:
                 if (object.objects.length == 0) {
-                    trace(debug_path);
-                    trace(object.string());
+                    // trace(debug_path);
+                    // trace(object.string());
                     // throw "FIELD NEEDS MORE";
                 }
                 final field = exprToValueString(objectToExpr(object.objects[1]));
@@ -144,12 +144,18 @@ class ExprParser {
             case ARRAY:
                 specialDef = DArray;
                 null;
+            case ARRAYDECL:
+                EArray(objectToExpr(object.objects[0]), objectToExpr(object.objects[1]));
             case NEW:
-                // TODO
-                trace("new not implemented");
-                ENew(null, []);
+                final ct = HaxeExprTools.stringToComplexType(object.objects[0].string());
+                switch ct {
+                    case TPath(p):
+                        ENew(p, object.objects.slice(1).map(obj -> objectToExpr(obj)));
+                    default:
+                        throw "unknown ct for new: " + ct;
+                }
             case OBJDECL:
-                trace("object decl not implemented");
+                // trace("object decl not implemented");
                 EObjectDecl([]);
             case VAR:
                 EVars([{
@@ -157,7 +163,8 @@ class ExprParser {
                     expr: object.objects.length == 0 ? null : objectToExpr(object.objects[0]),
                 }]);
             case WHILE:
-                EWhile(objectToExpr(object.objects[0]), objectToExpr(object.objects[1]), false);
+                // TODO normal while bool not implemented
+                EWhile(objectToExpr(object.objects[0]), objectToExpr(object.objects[1]), true);
             case LOCAL:
                 object.defType = object.subType;
                 specialDef = Local;
@@ -169,6 +176,8 @@ class ExprParser {
             case FANON:
                 specialDef = FAnon("#UNKNOWN_FANON");
                 null;
+            case FOR:
+                EFor(objectToExpr(object.objects[0]), objectToExpr(object.objects[1]));
             case IF:
                 EIf(objectToExpr(object.objects[0]), objectToExpr(object.objects[1]), object.objects.length <= 2 ? null : objectToExpr(object.objects[2]));
             case THEN:
@@ -235,9 +244,9 @@ class ExprParser {
     function printObject(object:Object, depth:Int=0) {
         final tab = [for (i in 0...depth * 4) " "].join("");
         // final objectStr = "(" + object.string() + ")";
-        trace(tab + object.def + "[" + object.defType + " " + object.subType + "]");
+        // trace(tab + object.def + "[" + object.defType + " " + object.subType + "]");
         if (object.def == STRING)
-            trace(tab + "    " + object.string());
+            // trace(tab + "    " + object.string());
         for (subObject in object.objects) {
             printObject(subObject, depth + 1);
         }
@@ -262,7 +271,7 @@ class ExprParser {
             if (lastObject != null&& trimmedString.length > 0) {
                 if (lastObject.lineIndex == lineIndex) {
                     if (trimmedString == ";") {
-                        trace("ENDING EXPR PARSER ON LINE (semicolon found): " + line);
+                        // trace("ENDING EXPR PARSER ON LINE (semicolon found): " + line);
                         return null;
                     }
                     final object = Object.fromString(lineIndex, 0, trimmedString);
@@ -271,7 +280,7 @@ class ExprParser {
                     // Next line arbitrary #STRING, for example: BINOP +
                     final startIndex = lines[lineIndex].length - trimmedString.length + 1;
                     final object = Object.fromString(lineIndex, startIndex, trimmedString);
-                    trace(lineIndex, startIndex, trimmedString);
+                    // trace(lineIndex, startIndex, trimmedString);
                     nextLine();
                     return object;
                 }
@@ -285,7 +294,7 @@ class ExprParser {
         if (objectEndIndex < objectStartIndex) {
             // TODO more advanced check
             // Assume: cf_overloads = [];
-            trace("ENDING EXPR PARSER ON LINE: " + line);
+            // trace("ENDING EXPR PARSER ON LINE: " + line);
             return null;
         }
         stringIndex = objectEndIndex + 1;

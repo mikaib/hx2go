@@ -32,6 +32,9 @@ class Translator {
                     VarDeclarations.translateVarsDeclarations(this, vars);
                 case EBinop(op, e1, e2):
                     BinopExpr.translateBinop(this, op, e1, e2);
+                case EWhile(econd, e, normalWhile):
+                    While.translateWhile(this, econd, e, normalWhile);
+                    
                 default:
                     "_ = 0";
             }
