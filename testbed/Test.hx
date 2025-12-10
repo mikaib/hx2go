@@ -71,54 +71,51 @@ extern class Raylib {
 @:analyzer(ignore)
 class Test {
     public static function main() {
-        var a: Int = 10;
-        var b: Int = a++;
+        Raylib.InitWindow(800, 400, "raylib [core] example - basic window");
 
-        //Raylib.InitWindow(800, 400, "raylib [core] example - basic window");
+        var target_x = Convert.float32(0.0);
+        var target_y = Convert.float32(0.0);
+        var vel_x = Convert.float32(0.0);
+        var vel_y = Convert.float32(0.0);
+        var current_x = Convert.float32(0.0);
+        var current_y = Convert.float32(0.0);
 
-        //var target_x = Convert.float32(0.0);
-        //var target_y = Convert.float32(0.0);
-        //var vel_x = Convert.float32(0.0);
-        //var vel_y = Convert.float32(0.0);
-        //var current_x = Convert.float32(0.0);
-        //var current_y = Convert.float32(0.0);
+        final stiffness = Convert.float32(10.0);
+        final damping = Convert.float32(2.0);
 
-        //final stiffness = Convert.float32(10.0);
-        //final damping = Convert.float32(2.0);
+        while (!Raylib.WindowShouldClose()) {
+            target_x = Convert.float32(Raylib.GetMouseX());
+            target_y = Convert.float32(Raylib.GetMouseY());
 
-        //while (!Raylib.WindowShouldClose()) {
-        //    target_x = Convert.float32(Raylib.GetMouseX());
-        //    target_y = Convert.float32(Raylib.GetMouseY());
+            var dx = current_x - target_x;
+            var dy = current_y - target_y;
 
-        //    var dx = current_x - target_x;
-        //    var dy = current_y - target_y;
+            var fx = -stiffness * dx;
+            var fy = -stiffness * dy;
 
-        //    var fx = -stiffness * dx;
-        //    var fy = -stiffness * dy;
+            var dmx = -damping * vel_x;
+            var dmy = -damping * vel_y;
 
-        //    var dmx = -damping * vel_x;
-        //    var dmy = -damping * vel_y;
+            var ax = fx + dmx;
+            var ay = fy + dmy;
 
-        //    var ax = fx + dmx;
-        //    var ay = fy + dmy;
+            var dt = Raylib.GetFrameTime();
+            vel_x += ax * dt;
+            vel_y += ay * dt;
 
-        //    var dt = Raylib.GetFrameTime();
-        //    vel_x += ax * dt;
-        //    vel_y += ay * dt;
+            current_x += vel_x * dt;
+            current_y += vel_y * dt;
 
-        //    current_x += vel_x * dt;
-        //    current_y += vel_y * dt;
+            Raylib.BeginDrawing();
+            Raylib.ClearBackground(Raylib.White);
 
-        //    Raylib.BeginDrawing();
-        //    Raylib.ClearBackground(Raylib.White);
+            Raylib.DrawCircle(Convert.int32(target_x), Convert.int32(target_y), 20.0, Raylib.DarkGreen);
+            Raylib.DrawCircle(Convert.int32(current_x), Convert.int32(current_y), 15.0, Raylib.Lime);
 
-        //    Raylib.DrawCircle(Convert.int32(target_x), Convert.int32(target_y), 20.0, Raylib.DarkGreen);
-        //    Raylib.DrawCircle(Convert.int32(current_x), Convert.int32(current_y), 15.0, Raylib.Lime);
+            Raylib.EndDrawing();
+        }
 
-        //    Raylib.EndDrawing();
-        //}
-
-        //Raylib.CloseWindow();
+        Raylib.CloseWindow();
 
         //var n = 10;
         //var a = 0;
