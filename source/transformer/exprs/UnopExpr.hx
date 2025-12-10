@@ -14,9 +14,11 @@ function transformUnop(t:Transformer, e0: HaxeExpr, op: Unop, postFix: Bool, e1:
     }
 
     // ignore if parent is a block
+    var inBlock = false;
     if (e0.parent != null) {
         switch (e0.parent.def) {
-            case EBlock(_): return;
+            case EBlock(_) if (postFix): return;
+            case EBlock(_): inBlock = true;
             case _: null;
         }
     }
@@ -41,8 +43,9 @@ function transformUnop(t:Transformer, e0: HaxeExpr, op: Unop, postFix: Bool, e1:
     var e3: HaxeExpr = { t: null, specialDef: null, def: EBinop(OpAssignOp(binop), e1, one) };
 
     // extract to temporary
-    var tmp = t.createTemporary(postFix ? e1 : e2, null, e3);
-
-    // we replace the UnOp with the proper identifier
-    e0.def = tmp.def;
+    if (inBlock) e0.def = e3.def;
+    else {
+        var tmp = t.createTemporary(postFix ? e1 : e2, null, e3);
+        e0.def = tmp.def;
+    }
 }
