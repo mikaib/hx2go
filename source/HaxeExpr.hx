@@ -221,6 +221,7 @@ class HaxeTypeDefinition {
     }
 	public var name:String;
 	public var module:String;
+	public var isExtern:Bool;
 	// need to cache this after the first use
 	public var meta:Void->Array<MetadataEntry>;
 	public var fields:Array<HaxeField>;
