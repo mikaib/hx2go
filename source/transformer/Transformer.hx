@@ -37,7 +37,7 @@ class Transformer {
             case EIf(cond, branchTrue, branchFalse):
                 If.transformIf(this, e, cond, branchTrue, branchFalse);
             case EVars(vars):
-                VarDeclarations.transformVarDeclarations(this, vars);
+                VarDeclarations.transformVarDeclarations(this, e, vars);
             default:
                 iterateExpr(e);
         }
@@ -64,6 +64,11 @@ class Transformer {
                     }
                 }
                 final td = t.module.resolveClass(p.pack, p.name);
+                if (td == null) {
+                    trace('td is null in transformComplexType for' + ct);
+                    return;
+                }
+
                 for (meta in td.meta()) {
                     switch meta.name {
                         case ":coreType":
@@ -77,11 +82,12 @@ class Transformer {
                                 case "go.Int8": "int8";
                                 // TODO handle UInt types
                                 default:
-                                    throw "unhandled coreType: " + td.name;
+                                    trace("unhandled coreType: " + td.name);
+                                    "#UNKNOWN_TYPE";
                             }
                     }
                 }
-            default: 
+            default:
         }
     }
     public function transformDef(def:HaxeTypeDefinition) {
@@ -152,11 +158,16 @@ class Transformer {
             insertCount++;
         }
 
+        var path: Array<String>;
+        if (e.t != null) path = e.t.split(".");
+        else path = [];
+
+        var typeModule = path.pop();
         children.insert(insertPos, {
-            t: null,
+            t: e.t,
             specialDef: null,
             def: EVars([
-                { name: '_temp_$id', expr: e }
+                { name: '_temp_$id', expr: e, type: path.length > 0 ? TPath({ pack: path, name: typeModule }) : null }
             ])
         });
 
