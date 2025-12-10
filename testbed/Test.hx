@@ -23,19 +23,22 @@ extern class Fmt {
 @:analyzer(ignore)
 class Test {
     public static function main() {
-        var n = 10;
-        var a = 0;
-        var b = 1;
-        var next = b;
-        var count = 1;
+        //var n = 10;
+        //var a = 0;
+        //var b = 1;
+        //var next = b;
+        //var count = 1;
 
-        do {
-            Fmt.println(next);
-            count++;
-            a = b;
-            b = next;
-            next = a + b;
-        } while (count <= n);
+        //do {
+        //    Fmt.println(next);
+        //    var newC = count++;
+        //    a = b;
+        //    b = next;
+        //    next = a + b;
+        //} while (count <= n);
+
+        var x = 0;
+        while (x < 20) x++;
 
         //var x = 0;
         //Fmt.println(x++);

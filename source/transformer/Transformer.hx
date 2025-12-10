@@ -32,6 +32,8 @@ class Transformer {
                 FieldAccess.transformFieldAccess(this, e);
             case EUnop(op, postFix, e1):
                 UnopExpr.transformUnop(this, e, op, postFix, e1);
+            case EWhile(cond, body, norm):
+                While.transformWhile(this, e, cond, body, norm);
             default:
                 var idx = 0;
                 HaxeExprTools.iter(e, (le) -> {
