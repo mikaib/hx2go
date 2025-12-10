@@ -8,7 +8,7 @@ function transformFieldAccess(t:Transformer, e:HaxeExpr) {
     switch e.def {
         case EField(e2, field, kind):
             var isNative = resolveExpr(t, e2);
-            field = isNative ? field : toPascalCase(field); // field.charAt(0).toUpperCase() + field.substr(1);
+            field = isNative ? field : toPascalCase(field); // TODO: should use field's @:go.native
             e.def = EField(e2, field, kind);
         default:
     }
