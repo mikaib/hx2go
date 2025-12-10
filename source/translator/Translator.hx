@@ -11,6 +11,18 @@ import HaxeExpr.HaxeTypeDefinition;
  */
 @:structInit
 class Translator {
+    public inline function translateComplexType(ct:ComplexType):String {
+        return switch ct {
+            case TPath(p):
+                if (p.pack.length == 0) {
+                    p.name;
+                }else{
+                    p.pack.join(".") + p.name;
+                }
+            default:
+                throw "unknown ct for translateComplexType: " + ct;
+        }
+    }
     public function translateExpr(e:HaxeExpr):String {
         if (e == null)
             return "#NULL_TRANSLATED_EXPR";
@@ -81,3 +93,5 @@ class Translator {
         return buf.toString();
     }
 }
+
+

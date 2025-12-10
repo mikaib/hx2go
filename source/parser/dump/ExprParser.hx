@@ -162,6 +162,7 @@ class ExprParser {
             case VAR:
                 EVars([{
                     name: object.subType.substr(0, object.subType.indexOf("<")),
+                    type: HaxeExprTools.stringToComplexType(object.defType),
                     expr: object.objects.length == 0 ? null : objectToExpr(object.objects[0]),
                 }]);
             case WHILE:

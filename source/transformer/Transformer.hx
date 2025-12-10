@@ -36,6 +36,8 @@ class Transformer {
                 While.transformWhile(this, e, cond, body, norm);
             case EIf(cond, branchTrue, branchFalse):
                 If.transformIf(this, e, cond, branchTrue, branchFalse);
+            case EVars(vars):
+                VarDeclarations.transformVarDeclarations(this, vars);
             default:
                 iterateExpr(e);
         }
@@ -46,6 +48,41 @@ class Transformer {
             transformExpr(le, e, idx);
             idx++;
         });
+    }
+    public function transformComplexType(t:Transformer, ct:ComplexType) {
+        switch ct {
+            case TPath(p):
+                // transform params of complexType
+                if (p.params != null) {
+                    for (param in p.params) {
+                        switch param {
+                            case TPType(t2):
+                                transformComplexType(t, t2);
+                            default:
+
+                        }
+                    }
+                }
+                final td = t.module.resolveClass(p.pack, p.name);
+                for (meta in td.meta()) {
+                    switch meta.name {
+                        case ":coreType":
+                            p.pack = [];
+                            p.name = switch td.name {
+                                case "go.Float32", "Single": "float32";
+                                case "Float": "float64";
+                                case "go.Int32", "Int": "int32";
+                                case "go.Int64": "int64";
+                                case "go.Int16": "int16";
+                                case "go.Int8": "int8";
+                                // TODO handle UInt types
+                                default:
+                                    throw "unhandled coreType: " + td.name;
+                            }
+                    }
+                }
+            default: 
+        }
     }
     public function transformDef(def:HaxeTypeDefinition) {
         if (def.fields == null)
