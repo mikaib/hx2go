@@ -18,13 +18,23 @@ class Module {
     public function resolveLocalDef(module:Module, name:String) {
         for (def in module.defs) {
                 switch def.kind {
-                    case TDClass:
-                        if (def.name == name)
-                            return def;
-                    case _:
+                case TDClass:
+                    if (def.name == name)
+                        return def;
+                default:
             }
         }
-
+        switch name {
+            case "String":
+                final module = context.getModule("String");
+                return resolveGlobalDef(module, name);
+            case "Float", "Int", "Single", "Bool":
+                // StdTypes is module
+                // global
+                final module = context.getModule("StdTypes");
+                return resolveGlobalDef(module, name);
+            default:
+        }
         trace("not resolving def: " + name);
         return null;
     }
