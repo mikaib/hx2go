@@ -66,18 +66,18 @@ class Test {
         var c = 10;
         var b = c++;
         var target_x:go.Float32 = 0.0;
-        var target_y = Convert.float32(0.0);
-        var vel_x = Convert.float32(0.0);
-        var vel_y = Convert.float32(0.0);
-        var current_x = Convert.float32(0.0);
-        var current_y = Convert.float32(0.0);
+        var target_y:go.Float32 = 0.0;
+        var vel_x:go.Float32 = 0.0;
+        var vel_y:go.Float32 = 0.0;
+        var current_x:go.Float32 = 0.0;
+        var current_y:go.Float32 = 0.0;
 
-        final stiffness = Convert.float32(10.0);
-        final damping = Convert.float32(2.0);
+        final stiffness:go.Float32 = 10.0;
+        final damping:go.Float32 = 2.0;
 
         while (!Raylib.WindowShouldClose()) {
-            target_x = Convert.float32(Raylib.GetMouseX());
-            target_y = Convert.float32(Raylib.GetMouseY());
+            target_x = Raylib.GetMouseX();
+            target_y = Raylib.GetMouseY();
 
             var dx = current_x - target_x;
             var dy = current_y - target_y;
