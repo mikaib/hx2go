@@ -40,6 +40,8 @@ class Transformer {
                 VarDeclarations.transformVarDeclarations(this, e, vars);
             case EBinop(op, e1, e2):
                 BinopExpr.transformBinop(this, e, op, e1, e2);
+            case EBlock(exprs):
+                Block.transformBlock(this, e, exprs);
             default:
                 iterateExpr(e);
         }
@@ -138,6 +140,10 @@ class Transformer {
         transformComplexType(ct);
         e.def = ECheckType(e.copy(), ct);
     }
+    public function getTempName(?id: Int): String {
+        var localId = id ?? tempId++;
+        return '_temp_$localId';
+    }
     public function createTemporary(e:HaxeExpr, ?pre:HaxeExpr, ?post: HaxeExpr): HaxeExpr {
         var expr: HaxeExpr = {
             t: null,
@@ -161,8 +167,8 @@ class Transformer {
             return expr;
         }
 
-        var id = tempId++;
-        expr.def = EConst(CIdent('_temp_$id'));
+        var name = getTempName();
+        expr.def = EConst(CIdent(name));
 
         var insertPos = block.pos;
         var insertCount = 0;
@@ -182,7 +188,7 @@ class Transformer {
             t: e.t,
             specialDef: null,
             def: EVars([
-                { name: '_temp_$id', expr: e, type: path.length > 0 ? TPath({ pack: path, name: typeModule }) : null }
+                { name: name, expr: e, type: path.length > 0 ? TPath({ pack: path, name: typeModule }) : null }
             ])
         });
 
