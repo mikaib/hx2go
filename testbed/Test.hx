@@ -1,21 +1,11 @@
-@:coreType @:notNull @:runtimeValue abstract Single to Float from Float {}
-
 // NOTE: @:native causes the name to change in the dump file
 // We only want to use the metadata to point to the Go reference api
+import go.Convert;
 @:go.package("fmt")
 @:go.native("fmt")
 extern class Fmt {
     @:go.native("Println")
 	public static extern function Println(e:haxe.Rest<Dynamic>):Void;
-}
-
-@:go.toplevel
-extern class Convert {
-    @:go.native("int32")
-    public static extern function int32(x: Float): Int;
-
-    @:go.native("float32")
-    public static extern function float32(x: Float): Single;
 }
 
 @:go.package("image/color")
@@ -29,6 +19,7 @@ extern class Raylib {
     public static extern var Black: RGBA; // maps to rl.Black
     public static extern var Lime: RGBA; // maps to rl.Black
     public static extern var DarkGreen: RGBA; // maps to rl.Black
+    public static extern var Red: RGBA;
 
     @:go.native("InitWindow") // could be removed if function name was "InitWindow"
     public static extern function InitWindow(width: Int, height: Int, title: String): Void;
@@ -64,7 +55,7 @@ extern class Raylib {
     public static extern function GetMouseY(): Int;
 
     @:go.native("GetFrameTime")
-    public static extern function GetFrameTime(): Float;
+    public static extern function GetFrameTime(): go.Float32;
 }
 
 @:dce(ignore)
@@ -72,8 +63,9 @@ extern class Raylib {
 class Test {
     public static function main() {
         Raylib.InitWindow(800, 400, "raylib [core] example - basic window");
-
-        var target_x = Convert.float32(0.0);
+        var c = 10;
+        var b = c++;
+        var target_x:go.Float32 = 0.0;
         var target_y = Convert.float32(0.0);
         var vel_x = Convert.float32(0.0);
         var vel_y = Convert.float32(0.0);
@@ -109,7 +101,7 @@ class Test {
             Raylib.BeginDrawing();
             Raylib.ClearBackground(Raylib.White);
 
-            Raylib.DrawCircle(Convert.int32(target_x), Convert.int32(target_y), 20.0, Raylib.DarkGreen);
+            Raylib.DrawCircle(Convert.int32(target_x), Convert.int32(target_y), 20.0, Raylib.Red);
             Raylib.DrawCircle(Convert.int32(current_x), Convert.int32(current_y), 15.0, Raylib.Lime);
 
             Raylib.EndDrawing();
