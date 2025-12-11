@@ -28,6 +28,16 @@ class HaxeExpr {
 		};
 	}
 
+	public function copyFrom(other:HaxeExpr, deep:Bool = false) {
+	    remapTo = other.remapTo;
+		specialDef = other.specialDef;
+		parent = deep ? other.parent.copy() : other.parent;
+		parentIdx = other.parentIdx;
+		flags = other.flags;
+		def = other.def;
+		t = other.t;
+	}
+
 	public function toString(): String {
 		return Std.string(def);
 	}

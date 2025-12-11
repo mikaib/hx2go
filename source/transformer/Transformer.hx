@@ -126,6 +126,9 @@ class Transformer {
         while (parent != null) {
             switch (parent?.def) {
                 case EBlock(_): break;
+                case _ if (parent == parent.parent):
+                    trace('findOuterBlock has gone tragically wrong...');
+                    break; // uhhhh...?
                 case _:
                     pos = parent.parentIdx;
                     parent = parent.parent;

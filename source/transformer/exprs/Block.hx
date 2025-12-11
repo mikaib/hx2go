@@ -19,8 +19,28 @@ function transformBlock(t:Transformer, e:HaxeExpr, exprs:Array<HaxeExpr>) {
         return; // the block is allowed, no need to process it further.
     }
 
-    trace(e);
     extractBlock(t, [], e);
+
+    var finalExpr = exprs.pop();
+    e.copyFrom(finalExpr);
+
+    var block = t.findOuterBlock(e.parent);
+    trace(block);
+
+    var insertInto = switch (block.of.def) {
+        case EBlock(x): x;
+        case _: null;
+    }
+
+    if (insertInto == null) {
+        trace('insertInto should not be null!');
+        return;
+    }
+
+    var insertAt = block.pos;
+    for (expr in exprs) {
+        insertInto.insert(insertAt, expr);
+    }
 }
 
 // this function takes a block and modifies the contents so everything is unique (no duplicate var names and such...)
