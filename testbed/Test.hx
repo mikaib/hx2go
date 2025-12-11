@@ -65,6 +65,7 @@ extern class Raylib {
 class Test {
     public static function main() {
         Raylib.InitWindow(800, 400, "raylib [core] example - basic window");
+
         var target_x:Float32 = 0.0;
         var target_y:Float32 = 0.0;
         var vel_x:Float32 = 0.0;

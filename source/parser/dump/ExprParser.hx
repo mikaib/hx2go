@@ -130,7 +130,7 @@ class ExprParser {
                         EConst(CIdent(s));
                 }
             case META:
-                return objectToExpr(object.objects[0]);
+                return objectToExpr(object.objects[object.objects.length - 1]);
             case ARG:
                 // TODO add arg info
                 specialDef = Arg("");
@@ -348,11 +348,11 @@ class ExprParser {
             defString = objectString.substring(0, spaceIndex);
         }
         final subType = subTypeString;
-        switch defString {
-            case "Meta":
-                handleMetaAST();
-            default:
-        }
+        //switch defString {
+        //    case "Meta":
+        //        handleMetaAST();
+        //    default:
+        //}
         return new Object(defString, defType, lineIndex, startIndex, subType, objectString);
     }
 
