@@ -187,7 +187,7 @@ function main() {
     for (t in types) {
         var module = toModuleName(t);
         convContent.add('   @:go.native("$t")\n');
-        convContent.add('   public static extern function $t(x: Any): $module;\n');
+        convContent.add('   @:pure public static extern function $t(x: Any): $module;\n');
     }
 
     convContent.add('}');
