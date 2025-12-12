@@ -12,6 +12,7 @@ function transformBinop(t:Transformer, e:HaxeExpr, op:Binop, e1:HaxeExpr, e2:Hax
     //    default:
     //        t.transformTypeConversion(e.t, e1);
     //}
+
     //t.transformTypeConversion(e.t, e2);
     t.iterateExpr(e);
 }

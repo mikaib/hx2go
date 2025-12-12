@@ -19,18 +19,16 @@ function transformBlock(t:Transformer, e:HaxeExpr, exprs:Array<HaxeExpr>) {
         return; // the block is allowed, no need to process it further.
     }
 
+    var block = t.findOuterBlock(e.parent);
+    var insertInto = switch (block.of.def) {
+        case EBlock(x): x;
+        case _: null;
+    };
+
     extractBlock(t, [], e);
 
     var finalExpr = exprs.pop();
     e.copyFrom(finalExpr);
-
-    var block = t.findOuterBlock(e.parent);
-    trace(block);
-
-    var insertInto = switch (block.of.def) {
-        case EBlock(x): x;
-        case _: null;
-    }
 
     if (insertInto == null) {
         trace('insertInto should not be null!');
@@ -40,6 +38,7 @@ function transformBlock(t:Transformer, e:HaxeExpr, exprs:Array<HaxeExpr>) {
     var insertAt = block.pos;
     for (expr in exprs) {
         insertInto.insert(insertAt, expr);
+        insertAt++;
     }
 }
 
@@ -59,7 +58,7 @@ function extractBlock(t:Transformer, remappedNames:Map<String, String>, e:HaxeEx
             }
 
         case EConst(CIdent(name)):
-            e.def = EConst(CIdent(remappedNames[name] ?? name));
+            e.def = EConst(CIdent(remappedNames[name] ?? name)); // TODO: we must ensure that this only remaps on exact CIdent matches and not on an CIdent in fieldaccess...
 
         case _: HaxeExprTools.iter(e, extractBlock.bind(t, remappedNames, _));
     }

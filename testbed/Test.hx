@@ -64,51 +64,59 @@ extern class Raylib {
 @:analyzer(ignore)
 class Test {
     public static function main() {
-        Raylib.InitWindow(800, 400, "raylib [core] example - basic window");
+        var test = {
+            var x = 1 + 2;
+            var y = x * 5;
+            var z = y / 2;
+            z;
+        };
 
-        var target_x:Float32 = 0.0;
-        var target_y:Float32 = 0.0;
-        var vel_x:Float32 = 0.0;
-        var vel_y:Float32 = 0.0;
-        var current_x:Float32 = 0.0;
-        var current_y:Float32 = 0.0;
 
-        final stiffness:Float32 = 10.0;
-        final damping:Float32 = 2.0;
+        //Raylib.InitWindow(800, 400, "raylib [core] example - basic window");
 
-        while (!Raylib.WindowShouldClose()) {
-            target_x = Raylib.GetMouseX();
-            target_y = Raylib.GetMouseY();
+        //var target_x:Float32 = 0.0;
+        //var target_y:Float32 = 0.0;
+        //var vel_x:Float32 = 0.0;
+        //var vel_y:Float32 = 0.0;
+        //var current_x:Float32 = 0.0;
+        //var current_y:Float32 = 0.0;
 
-            var dx = current_x - target_x;
-            var dy = current_y - target_y;
+        //final stiffness:Float32 = 10.0;
+        //final damping:Float32 = 2.0;
 
-            var fx = -stiffness * dx;
-            var fy = -stiffness * dy;
+        //while (!Raylib.WindowShouldClose()) {
+        //    target_x = Raylib.GetMouseX();
+        //    target_y = Raylib.GetMouseY();
 
-            var dmx = -damping * vel_x;
-            var dmy = -damping * vel_y;
+        //    var dx = current_x - target_x;
+        //    var dy = current_y - target_y;
 
-            var ax = fx + dmx;
-            var ay = fy + dmy;
+        //    var fx = -stiffness * dx;
+        //    var fy = -stiffness * dy;
 
-            var dt = Raylib.GetFrameTime();
-            vel_x += ax * dt;
-            vel_y += ay * dt;
+        //    var dmx = -damping * vel_x;
+        //    var dmy = -damping * vel_y;
 
-            current_x += vel_x * dt;
-            current_y += vel_y * dt;
+        //    var ax = fx + dmx;
+        //    var ay = fy + dmy;
 
-            Raylib.BeginDrawing();
-            Raylib.ClearBackground(Raylib.White);
+        //    var dt = Raylib.GetFrameTime();
+        //    vel_x += ax * dt;
+        //    vel_y += ay * dt;
 
-            Raylib.DrawCircle(Convert.int32(target_x), Convert.int32(target_y), 20.0, Raylib.Red);
-            Raylib.DrawCircle(Convert.int32(current_x), Convert.int32(current_y), 15.0, Raylib.Lime);
+        //    current_x += vel_x * dt;
+        //    current_y += vel_y * dt;
 
-            Raylib.EndDrawing();
-        }
+        //    Raylib.BeginDrawing();
+        //    Raylib.ClearBackground(Raylib.White);
 
-        Raylib.CloseWindow();
+        //    Raylib.DrawCircle(Convert.int32(target_x), Convert.int32(target_y), 20.0, Raylib.Red);
+        //    Raylib.DrawCircle(Convert.int32(current_x), Convert.int32(current_y), 15.0, Raylib.Lime);
+
+        //    Raylib.EndDrawing();
+        //}
+
+        //Raylib.CloseWindow();
 
         //var n = 10;
         //var a = 0;
