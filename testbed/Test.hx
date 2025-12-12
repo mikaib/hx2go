@@ -1,5 +1,6 @@
 // NOTE: @:native causes the name to change in the dump file
 // We only want to use the metadata to point to the Go reference api
+import go.Int64;
 import go.Int32;
 import go.Float32;
 import go.Convert;
@@ -41,8 +42,8 @@ extern class Raylib {
     @:go.native("ClearBackground")
     public static extern function ClearBackground(colour: RGBA): Void;
 
-    @:go.native("DrawText")
-    public static extern function DrawText(str: String, x: Int32, y: Int32, size: Int32, colour: RGBA): Void;
+    @:go.native("DrawFPS")
+    public static extern function DrawFPS(x: Int32, y: Int32): Void;
 
     @:go.native("DrawCircle")
     public static extern function DrawCircle(x: Int32, y: Int32, radius: Float32, colour: RGBA): Void;
@@ -102,6 +103,7 @@ class Test {
             Raylib.BeginDrawing();
             Raylib.ClearBackground(Raylib.White);
 
+            Raylib.DrawFPS(10, 10);
             Raylib.DrawCircle(Convert.int32(target_x), Convert.int32(target_y), 20.0, Raylib.Red);
             Raylib.DrawCircle(Convert.int32(current_x), Convert.int32(current_y), 15.0, Raylib.Lime);
 

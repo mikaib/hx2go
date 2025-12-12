@@ -126,6 +126,15 @@ abstract UInt64 {
    @:from public static inline function fromUInt32(x: UInt32): UInt64 {
        return Convert.uint64(x);
    }
+   @:from public static inline function fromInt8(x: Int8): UInt64 {
+       return Convert.uint64(x);
+   }
+   @:from public static inline function fromInt16(x: Int16): UInt64 {
+       return Convert.uint64(x);
+   }
+   @:from public static inline function fromInt32(x: Int32): UInt64 {
+       return Convert.uint64(x);
+   }
    @:to public inline function toFloat(): Float {
        return (untyped this : Float);
    }

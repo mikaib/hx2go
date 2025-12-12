@@ -129,8 +129,7 @@ function main() {
         var fromTypes = ['Int'];
         for (f in types) {
             if (isFloatType(f)) continue;
-            if (!isUnsigned(f) && !signed) continue; // Int32 can hold UInt16, UInt16 cannot hold Int32, Int32 cannot hold UInt32
-            if (getPrecision(f) >= precision && (!isFloat || getPrecision(f) != precision)) continue; // Int32 may not have fromInt32, but Float32 may have fromInt32.
+            if (getPrecision(f) == precision && !isFloat) continue;
 
             fromTypes.push(
                 toModuleName(f)
@@ -142,7 +141,7 @@ function main() {
 
             for (f in types) {
                 if (!isFloatType(f)) continue;
-                if (getPrecision(f) >= precision) continue;
+                if (getPrecision(f) == precision && isFloat) continue;
 
                 fromTypes.push(
                     toModuleName(f)

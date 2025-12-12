@@ -92,6 +92,9 @@ abstract Float32 {
    @:from public static inline function fromUInt32(x: UInt32): Float32 {
        return Convert.float32(x);
    }
+   @:from public static inline function fromUInt64(x: UInt64): Float32 {
+       return Convert.float32(x);
+   }
    @:from public static inline function fromInt8(x: Int8): Float32 {
        return Convert.float32(x);
    }
@@ -101,7 +104,13 @@ abstract Float32 {
    @:from public static inline function fromInt32(x: Int32): Float32 {
        return Convert.float32(x);
    }
+   @:from public static inline function fromInt64(x: Int64): Float32 {
+       return Convert.float32(x);
+   }
    @:from public static inline function fromFloat(x: Float): Float32 {
+       return Convert.float32(x);
+   }
+   @:from public static inline function fromFloat64(x: Float64): Float32 {
        return Convert.float32(x);
    }
    @:to public inline function toFloat(): Float {

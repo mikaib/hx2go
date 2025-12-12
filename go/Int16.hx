@@ -120,7 +120,19 @@ abstract Int16 {
    @:from public static inline function fromUInt8(x: UInt8): Int16 {
        return Convert.int16(x);
    }
+   @:from public static inline function fromUInt32(x: UInt32): Int16 {
+       return Convert.int16(x);
+   }
+   @:from public static inline function fromUInt64(x: UInt64): Int16 {
+       return Convert.int16(x);
+   }
    @:from public static inline function fromInt8(x: Int8): Int16 {
+       return Convert.int16(x);
+   }
+   @:from public static inline function fromInt32(x: Int32): Int16 {
+       return Convert.int16(x);
+   }
+   @:from public static inline function fromInt64(x: Int64): Int16 {
        return Convert.int16(x);
    }
    @:to public inline function toFloat(): Float {
