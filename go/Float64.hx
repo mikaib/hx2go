@@ -1,22 +1,60 @@
 package go;
 
-@:coreType @:notNull @:runtimeValue abstract Float64 {
-    @:from public static inline function fromFloat32(x: Float32): Float64 {
-        return Convert.float64(x);
-    }
-    @:from public static inline function fromHxFloat(x: Float): Float64 {
-        return Convert.float64(x);
-    }
-    @:from public static inline function fromInt8(x: Int8): Float64 {
-        return Convert.float64(x);
-    }
-    @:from public static inline function fromInt16(x: Int16): Float64 {
-        return Convert.float64(x);
-    }
-    @:from public static inline function fromInt64(x: Int64): Float64 {
-        return Convert.float64(x);
-    }
-    @:from public static inline function fromHxInt(x: Int): Float64 {
-        return Convert.float64(x);
-    }
+// ------------------------ THIS FILE HAS BEEN GENERATED! ------------------------
+// Please invoke the generator using `./Scripts/GenStdTypes` from the project root
+// ------------------------ THIS FILE HAS BEEN GENERATED! ------------------------
+
+@:coreType
+@:notNull
+@:runtimeValue
+abstract Float64 {
+   @:op(A + B) private function add(other: Float64): Float64;
+   @:op(A - B) private function sub(other: Float64): Float64;
+   @:op(A * B) private function mul(other: Float64): Float64;
+   @:op(A / B) private function div(other: Float64): Float64;
+   @:op(A % B) private function mod(other: Float64): Float64;
+   @:op(-A) private function neg(): Float64;
+   @:op(++A) private function preinc(): Float64;
+   @:op(A++) private function postinc(): Float64;
+   @:op(--A) private function predec(): Float64;
+   @:op(A--) private function postdec(): Float64;
+   @:op(A == B) private function eq(other: Float64): Bool;
+   @:op(A != B) private function neq(other: Float64): Bool;
+   @:op(A < B) private function lt(other: Float64): Bool;
+   @:op(A <= B) private function lte(other: Float64): Bool;
+   @:op(A > B) private function gt(other: Float64): Bool;
+   @:op(A >= B) private function gte(other: Float64): Bool;
+   @:from public static inline function fromInt(x: Int): Float64 {
+       return Convert.float64(x);
+   }
+   @:from public static inline function fromUInt8(x: UInt8): Float64 {
+       return Convert.float64(x);
+   }
+   @:from public static inline function fromUInt16(x: UInt16): Float64 {
+       return Convert.float64(x);
+   }
+   @:from public static inline function fromUInt32(x: UInt32): Float64 {
+       return Convert.float64(x);
+   }
+   @:from public static inline function fromUInt64(x: UInt64): Float64 {
+       return Convert.float64(x);
+   }
+   @:from public static inline function fromInt8(x: Int8): Float64 {
+       return Convert.float64(x);
+   }
+   @:from public static inline function fromInt16(x: Int16): Float64 {
+       return Convert.float64(x);
+   }
+   @:from public static inline function fromInt32(x: Int32): Float64 {
+       return Convert.float64(x);
+   }
+   @:from public static inline function fromInt64(x: Int64): Float64 {
+       return Convert.float64(x);
+   }
+   @:from public static inline function fromFloat(x: Float): Float64 {
+       return Convert.float64(x);
+   }
+   @:from public static inline function fromFloat32(x: Float32): Float64 {
+       return Convert.float64(x);
+   }
 }

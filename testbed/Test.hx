@@ -66,15 +66,15 @@ class Test {
     public static function main() {
         Raylib.InitWindow(800, 400, "raylib [core] example - basic window");
 
-        var target_x:Float32 = 0.0;
-        var target_y:Float32 = 0.0;
-        var vel_x:Float32 = 0.0;
-        var vel_y:Float32 = 0.0;
-        var current_x:Float32 = 0.0;
-        var current_y:Float32 = 0.0;
+        var target_x = 0.0;
+        var target_y = 0.0;
+        var vel_x = 0.0;
+        var vel_y = 0.0;
+        var current_x = 0.0;
+        var current_y = 0.0;
 
-        final stiffness:Float32 = 10.0;
-        final damping:Float32 = 2.0;
+        final stiffness = 10.0;
+        final damping = 2.0;
 
         while (!Raylib.WindowShouldClose()) {
             target_x = Raylib.GetMouseX();
