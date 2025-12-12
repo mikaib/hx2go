@@ -44,7 +44,7 @@ function transformBlock(t:Transformer, e:HaxeExpr, exprs:Array<HaxeExpr>) {
 
 // this function takes a block and modifies the contents so everything is unique (no duplicate var names and such...)
 function extractBlock(t:Transformer, remappedNames:Map<String, String>, e:HaxeExpr) {
-    if (e?.def == null) {
+    if (e.def == null) {
         return;
     }
 
@@ -58,8 +58,11 @@ function extractBlock(t:Transformer, remappedNames:Map<String, String>, e:HaxeEx
             }
 
         case EConst(CIdent(name)):
+            trace(name);
             e.def = EConst(CIdent(remappedNames[name] ?? name)); // TODO: we must ensure that this only remaps on exact CIdent matches and not on an CIdent in fieldaccess...
 
-        case _: HaxeExprTools.iter(e, extractBlock.bind(t, remappedNames, _));
+        case _:
     }
+
+    HaxeExprTools.iter(e, extractBlock.bind(t, remappedNames, _));
 }

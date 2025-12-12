@@ -177,7 +177,7 @@ class ExprParser {
             case LOCAL:
                 object.defType = object.subType;
                 specialDef = Local;
-                null;
+                EConst(CIdent(object.subType.substr(0, object.subType.indexOf("("))));
             case PARENTHESIS:
                 EParenthesis(objectToExpr(object.objects[0]));
             case THROW:

@@ -95,5 +95,3 @@ class Translator {
         return buf.toString();
     }
 }
-
-

@@ -13,6 +13,9 @@ package go;
     @:from public static inline function fromInt16(x: Int16): Float32 {
         return Convert.float32(x);
     }
+    @:from public static inline function fromInt32(x: Int32): Float32 {
+        return Convert.float32(x);
+    }
     @:from public static inline function fromInt64(x: Int64): Float32 {
         return Convert.float32(x);
     }
@@ -31,4 +34,7 @@ package go;
 
     @:op(A * B)
     public function mut(other: Float32): Float32;
+
+    @:op(A / B)
+    public function div(other: Float32): Float32;
 }
