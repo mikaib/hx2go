@@ -50,6 +50,8 @@ class Translator {
                     While.translateWhile(this, econd, e, normalWhile);
                 case ECheckType(e2, t):
                     CheckType.translateCheckType(this, e2, t);
+                case EUntyped(e):
+                    Untyped.translateUntyped(this, e);
                 default:
                     "_ = 0";
             }
