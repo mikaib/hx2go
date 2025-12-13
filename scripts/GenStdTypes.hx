@@ -41,8 +41,6 @@ var topLevel = [
     { hxName: "append", goName: "append",   returnType: "Slice<T>", types: ["T"], pure: false, isOverload: false, args: [ { name: "s", type: "Slice<T>" }, { name: "v", type: "haxe.Rest<T>" } ] },
     { hxName: "copy",   goName: "copy",     returnType: "Int32",    types: ["T"], pure: false, isOverload: false, args: [ { name: "dst", type: "Slice<T>" }, { name: "src", type: "Slice<T>" } ] },
     { hxName: "cap",    goName: "cap",      returnType: "Int32",    types: ["T"], pure: true,  isOverload: false, args: [ { name: "v", type: "Slice<T>" } ] },
-    { hxName: "slice",  goName: "slice",    returnType: "Slice<T>", types: ["T"], pure: true,  isOverload: true,  args: [ { name: "v", type: "Slice<T>" }, { name: "start", type: "Int32" }, { name: "end", type: "Int32" } ] },
-    { hxName: "slice",  goName: "slice",    returnType: "Slice<T>", types: ["T"], pure: true,  isOverload: true,  args: [ { name: "v", type: "Slice<T>" }, { name: "start", type: "Int32" } ] }
 ];
 
 var path = "./go";

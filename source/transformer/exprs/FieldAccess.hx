@@ -89,7 +89,7 @@ function resolvePkgTransform(t:Transformer, e:HaxeExpr, e2:HaxeExpr, field: Stri
                 case _: false;
             }
 
-        case ['go.Go', 'slice']:
+        case ['go._Slice.Slice_Impl_', '_sliceStart'] | ['go._Slice.Slice_Impl_', '_sliceStartEnd']:
             switch (e.parent.def) {
                 case ECall(e, params):
                     var on = params.shift();

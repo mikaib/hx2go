@@ -36,8 +36,4 @@ extern class Go {
    public static extern function copy<T>(dst: Slice<T>, src: Slice<T>): Int32;
    @:go.native("cap")
    @:pure public static extern function cap<T>(v: Slice<T>): Int32;
-   @:go.native("slice")
-   @:pure public static extern overload function slice<T>(v: Slice<T>, start: Int32, end: Int32): Slice<T>;
-   @:go.native("slice")
-   @:pure public static extern overload function slice<T>(v: Slice<T>, start: Int32): Slice<T>;
 }
