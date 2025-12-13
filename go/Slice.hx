@@ -34,7 +34,8 @@ extern abstract Slice<T> {
 
     // note: marked as extern to force inline
     @:arrayAccess private extern inline function set(index: Int, value: T): T {
-        return Syntax.code("{0}[{1}] = {2}", this, index, value);
+        Syntax.code("{0}[{1}] = {2}", this, index, value);
+        return value; // statement cannot be used as expression
     }
 
     @:pure public inline extern overload function slice(low: Int32, high: Int32, max: Int32): Slice<T> {
