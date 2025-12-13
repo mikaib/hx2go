@@ -7,6 +7,7 @@ import HaxeExpr;
 import transformer.Transformer;
 import translator.Translator;
 import translator.TranslatorTools;
+import haxe.macro.ComplexTypeTools;
 
 function transformFieldAccess(t:Transformer, e:HaxeExpr) {
     switch e.def {
@@ -92,7 +93,13 @@ function resolvePkgTransform(t:Transformer, e:HaxeExpr, e2:HaxeExpr, field: Stri
             }
 
         case ['go._Slice.Slice_Impl_', '_create']:
-            e.parent.def = EConst(CIdent('[]any{}'));
+            var ct = HaxeExprTools.stringToComplexType(e.parent.t);
+            t.transformComplexType(ct);
+
+            e.parent.def = EConst(CIdent(
+                ComplexTypeTools.toString(ct) + "{}"
+            ));
+
             false;
 
         case _: false;

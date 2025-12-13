@@ -55,15 +55,15 @@ extern class Raylib {
     public static extern function GetFrameTime(): Float32;
 }
 
-@:dce(ignore)
-@:analyzer(ignore)
+//@:dce(ignore)
+//@:analyzer(ignore)
 class Test {
     public static function main() {
         // Syntax.code
         var foo: Int32 = Syntax.code("5 + {0}", 10);
 
         // Slices
-        var bar: Slice<Int32> = new Slice();
+        var bar: Slice<Float32> = new Slice();
         bar = bar.append(1); // Go.append(slice, value) is also valid
         bar = bar.append(2);
         bar = bar.append(3);

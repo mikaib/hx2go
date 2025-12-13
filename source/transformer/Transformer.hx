@@ -4,6 +4,7 @@ import HaxeExpr;
 import HaxeExpr.HaxeTypeDefinition;
 import HaxeExpr.HaxeTypeDefinition;
 import haxe.macro.Expr.TypeDefinition;
+import haxe.macro.ComplexTypeTools;
 import haxe.macro.Expr;
 import transformer.exprs.*;
 
@@ -96,11 +97,30 @@ class Transformer {
                                 case "go.UInt8": "int8";
                                 case "go.Rune": "rune";
                                 case "go.Byte": "byte";
-                                case "go.Slice": "[]int32";
+                                case "go.Slice":
+                                    if (p.params[0] == null) {
+                                        "[]any";
+                                    } else {
+                                        final ct2 = switch (p.params[0]) {
+                                            case TPType(x): x;
+                                            case TPExpr(_): null;
+                                        }
+
+                                        if (ct2 == null) "[]any";
+                                        else {
+                                            transformComplexType(ct2);
+                                            "[]" + ComplexTypeTools.toString(ct2);
+                                        }
+                                    }
+
                                 case "Bool": "bool";
-                                default:
+                                case _:
                                     trace("unhandled coreType: " + td.name);
                                     "#UNKNOWN_TYPE";
+                            }
+                            p.params = switch td.name {
+                                case "go.Slice": [];
+                                case _: p.params;
                             }
                     }
                 }
