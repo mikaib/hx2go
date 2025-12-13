@@ -4,8 +4,6 @@ package go;
 @:runtimeValue
 extern abstract Slice<T> {
     @:pure private extern static function _create<T>(): T;
-    @:pure private extern static function _sliceStart<T>(slice: Slice<T>, start: Int32): Slice<T>;
-    @:pure private extern static function _sliceStartEnd<T>(slice: Slice<T>, start: Int32, end: Int32): Slice<T>;
 
     public var length(get, never): Int32;
     private inline function get_length(): Int32 {
@@ -29,11 +27,8 @@ extern abstract Slice<T> {
         return Go.copy(this, src);
     }
 
-    public inline extern overload function slice(start: Int32, end: Int32): Slice<T> {
-        return _sliceStartEnd(this, start, end);
-    }
-
-    public inline extern overload function slice(start: Int32): Slice<T> {
-        return _sliceStart(this, start);
-    }
+    @:arrayAccess private extern function get(index: Int): T;
+    @:arrayAccess private extern function set(index: Int, value: T): T;
+    public extern overload function slice(start: Int32, end: Int32): Slice<T>;
+    public extern overload function slice(start: Int32): Slice<T>;
 }

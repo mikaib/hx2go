@@ -89,7 +89,7 @@ function resolvePkgTransform(t:Transformer, e:HaxeExpr, e2:HaxeExpr, field: Stri
                 case _: false;
             }
 
-        case ['go._Slice.Slice_Impl_', '_sliceStart'] | ['go._Slice.Slice_Impl_', '_sliceStartEnd']:
+        case ['go._Slice.Slice_Impl_', 'slice']:
             switch (e.parent.def) {
                 case ECall(e, params):
                     var on = params.shift();
@@ -97,6 +97,29 @@ function resolvePkgTransform(t:Transformer, e:HaxeExpr, e2:HaxeExpr, field: Stri
                     var to = params.shift();
                     e.parent.def = EGoSliceOp(on, from, to);
                     t.iterateExpr(e.parent);
+                    true;
+
+                case _: false;
+            }
+
+        case ['go._Slice.Slice_Impl_', 'get']:
+            switch (e.parent.def) {
+                case ECall(e, params):
+                    var on = params.shift();
+                    var idx = params.shift();
+                    e.parent.def = EGoSliceGet(on, idx);
+                    true;
+
+                case _: false;
+            }
+
+        case ['go._Slice.Slice_Impl_', 'set']:
+            switch (e.parent.def) {
+                case ECall(e, params):
+                    var on = params.shift();
+                    var idx = params.shift();
+                    var val = params.shift();
+                    e.parent.def = EGoSliceSet(on, idx, val);
                     true;
 
                 case _: false;
