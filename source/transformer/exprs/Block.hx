@@ -28,7 +28,10 @@ function transformBlock(t:Transformer, e:HaxeExpr, exprs:Array<HaxeExpr>) {
     extractBlock(t, [], e);
 
     var finalExpr = exprs.pop();
-    e.copyFrom(finalExpr);
+    switch (e.parent.def) {
+        case EBlock(_): e.def = EBinop(OpAssign, { t: null, specialDef: null, def: EConst(CIdent("_")) }, finalExpr);
+        case _: e.copyFrom(finalExpr);
+    }
 
     if (insertInto == null) {
         trace('insertInto should not be null!');
