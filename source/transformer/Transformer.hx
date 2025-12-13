@@ -97,22 +97,7 @@ class Transformer {
                                 case "go.UInt8": "int8";
                                 case "go.Rune": "rune";
                                 case "go.Byte": "byte";
-                                case "go.Slice":
-                                    if (p.params[0] == null) {
-                                        "[]any";
-                                    } else {
-                                        final ct2 = switch (p.params[0]) {
-                                            case TPType(x): x;
-                                            case TPExpr(_): null;
-                                        }
-
-                                        if (ct2 == null) "[]any";
-                                        else {
-                                            transformComplexType(ct2);
-                                            "[]" + ComplexTypeTools.toString(ct2);
-                                        }
-                                    }
-
+                                case "go.Slice": '[]${transformComplexTypeParam(p.params, 0)}';
                                 case "Bool": "bool";
                                 case _:
                                     trace("unhandled coreType: " + td.name);
@@ -127,8 +112,30 @@ class Transformer {
             default:
         }
     }
+
+    public function transformComplexTypeParam(params: Array<TypeParam>, idx: Int) {
+        final p = params[idx];
+        if (p == null) {
+            return "any";
+        }
+
+        final ct = switch (p) {
+            case TPType(x): x;
+            case TPExpr(_): null;
+        }
+
+        if (ct == null) {
+            trace('@:const type parameter on @:generic class not supported!');
+            return "any";
+        }
+
+        transformComplexType(ct);
+        return ComplexTypeTools.toString(ct);
+    }
+
     private function isLowercasePrefix(s:String):Bool
         return s.charAt(0).toLowerCase() == s.charAt(0);
+
     public function transformDef(def:HaxeTypeDefinition) {
         if (def.fields == null)
             return;
