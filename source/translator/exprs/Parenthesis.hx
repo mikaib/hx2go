@@ -5,4 +5,4 @@ import HaxeExpr;
 
 function translateParenthesis(t:Translator, e:HaxeExpr) {
     return "(" + t.translateExpr(e) + ")";
-} 
+}

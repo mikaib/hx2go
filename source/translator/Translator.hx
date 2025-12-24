@@ -32,8 +32,6 @@ class Translator {
                     GoCode.translateGoCode(this, format, exprs);
                 case EGoSliceConstruct(ct):
                     GoSliceConstruct.translateGoSliceConstruct(this, ct);
-                case EParenthesis(e):
-                    Parenthesis.translateParenthesis(this, e);
                 case ECall(e, params):
                     Call.translateCall(this, e,params);
                 case EBlock(exprs):
@@ -58,6 +56,10 @@ class Translator {
                     Untyped.translateUntyped(this, e);
                 case ECast(e, t):
                     Cast.translateCast(this, e, t);
+                case EParenthesis(e):
+                    Parenthesis.translateParenthesis(this, e);
+                case EBreak:
+                    Break.translateBreak(this);
                 default:
                     "_ = 0";
             }

@@ -13,6 +13,6 @@ function transformVarDeclarations(t:Transformer, e:HaxeExpr, vars:Array<HaxeVar>
         }
 
         t.transformComplexType(vars[i].type);
-        t.transformExpr(vars[i].expr, e, i);
+        t.transformExpr(vars[i].expr);
     }
 }

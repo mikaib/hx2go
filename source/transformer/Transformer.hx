@@ -16,12 +16,9 @@ import transformer.exprs.*;
 class Transformer {
     public var module:Module = null;
     public var def:HaxeTypeDefinition = null;
-    public function transformExpr(e:HaxeExpr, ?parent:HaxeExpr, ?parentIdx:Int) {
+    public function transformExpr(e:HaxeExpr) {
         if (e == null || e.def == null)
             return;
-        if (parent != null)
-            e.parent = parent;
-            e.parentIdx = parentIdx;
 
         switch e.def {
             case EConst(c):
@@ -45,11 +42,7 @@ class Transformer {
         }
     }
     public function iterateExpr(e:HaxeExpr) {
-        var idx = 0;
-        HaxeExprTools.iter(e, (le) -> {
-            transformExpr(le, e, idx);
-            idx++;
-        });
+        HaxeExprTools.iter(e, transformExpr);
     }
     public function transformComplexType(ct:ComplexType) {
         if (ct == null) {
@@ -160,16 +153,6 @@ class Transformer {
             }
             if (field.expr != null)
                 transformExpr(field.expr);
-        }
-    }
-    public function ensureBlock(e:HaxeExpr):HaxeExpr {
-        if (e == null) {
-            return null;
-        }
-
-        return switch (e.def) {
-            case EBlock(_): e;
-            case _: { t: null, def: EBlock([e]) };
         }
     }
     public extern inline overload function exprToString(e:haxe.macro.Expr):String {
