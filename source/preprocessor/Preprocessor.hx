@@ -13,7 +13,7 @@ import transformer.exprs.*;
 enum ExprKind {
     Stmt;
     Expr;
-    Term; // either `Stmt` or `Expr`, example is ECall(...) which can be used as both.
+    EitherKind; // either `Stmt` or `Expr`, example is ECall(...) which can be used as both.
 }
 
 /**
@@ -104,7 +104,7 @@ class Preprocessor {
             switch getExprKind(e, scope) {
                 case Expr: toStmt(e, scope); // expr -> stmt (by `_ = expr`)
                 case Stmt: toExpr(e, scope); // stmt -> expr (by kind-specific extraction)
-                case Term: null;
+                case EitherKind: null;
             }
         }
 
@@ -330,8 +330,8 @@ class Preprocessor {
         return switch expr.def {
             case EBlock(_), EVars(_), EWhile(_, _, _), EIf(_, _, _), EReturn(_), EBinop(OpAssignOp(_), _, _), EBinop(OpAssign, _, _), EUnop(OpIncrement, _, _), EUnop(OpDecrement, _, _), EBreak: Stmt;
             case EConst(_), EField(_, _, _), ECast(_, _), EBinop(_, _, _), EUnop(_, _, _), ENew(_, _), EParenthesis(_): Expr;
-            case ECall(_, _): Term;
-            case _: trace('unknown kind for:', expr); Term;
+            case ECall(_, _): EitherKind;
+            case _: trace('unknown kind for:', expr); EitherKind;
         }
     }
 
@@ -339,7 +339,7 @@ class Preprocessor {
         return switch getExprKind(expr, scope) {
             case Stmt: canHoldStmt(p, scope);
             case Expr: canHoldExpr(p, scope);
-            case Term: true;
+            case EitherKind: true;
         }
     }
 
