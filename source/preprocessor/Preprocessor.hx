@@ -108,7 +108,13 @@ class Preprocessor {
             }
         }
 
-        switch e.def { // sometimes special handling needs to be done in order to ensure other transformations correctly apply
+        // sometimes special handling needs to be done in order to ensure other transformations correctly apply
+        switch e.def {
+            // ensure all children are extracted if any of them will be transformed or otherwise have any side effects
+            case EBinop(_, e0, e1): ensureSemantics(e, [e0, e1], scope);
+            case ECall(_, params): ensureSemantics(e, params, scope);
+
+            // extract conditional to body
             case EWhile(outerCond, body, norm): // if cond is `Stmt` (like EBlock(...) or EIf(...)) we need to extract the conditional to inside of the loop body, as otherwise it might be extracted out of the loop which causes incorrect behaviour.
                 switch outerCond.def {
                     case EParenthesis(cond) if (exprContainsStmt(cond, scope)): // while (x) y; -> while (true) if (!x) break; y;
@@ -138,6 +144,7 @@ class Preprocessor {
                     case _: null;
                 }
 
+            // special handling for prefix OpIncrement / OpDecrement as stmt
             case EUnop(op, postFix, expr) if (!postFix && (op == OpIncrement || op == OpDecrement)):
                 // this code will be ran if "++e" is used as a statement, this implies we don't care about the result of this EUnop(...)
                 // we transform it to postFix as it will result in the same value of `e` but without extracting it to a temporary, furthermore, if it is already postFix it should just work.
@@ -148,6 +155,19 @@ class Preprocessor {
         }
 
         iterateExpr(e, scope);
+    }
+
+    public function ensureSemantics(p: HaxeExpr, children: Array<HaxeExpr>, scope: PreprocessorScope): Void {
+        var willMutate = false;
+        for (c in children) {
+            willMutate = willMutate || (hasSideEffects(c, scope) || exprContainsStmt(c, scope));
+        }
+
+        if (!willMutate) {
+            return;
+        }
+
+        trace('need ensure semantics', p);
     }
 
     public function exprContainsStmt(e:HaxeExpr, scope:PreprocessorScope): Bool {
@@ -305,6 +325,24 @@ class Preprocessor {
 
                 stmt.def = EConst(CIdent(tmpName));
 
+            case EBinop(OpAssign, e1, e2):
+                var tmpName = getTempName(tempId++);
+                var into = getOuterBlock(stmt, scope);
+                insertExprs([
+                    stmt.copy(),
+                    {
+                        t: null,
+                        def: EVars([
+                            {
+                                name: tmpName,
+                                expr: e1
+                            }
+                        ])
+                    },
+                ], into.block, into.at);
+
+                stmt.def = EConst(CIdent(tmpName));
+
             case EBinop(OpAssignOp(op), e1, e2):
                 var tmpName = getTempName(tempId++);
                 var into = getOuterBlock(stmt, scope);
@@ -359,6 +397,28 @@ class Preprocessor {
             case EConst(_), EField(_, _, _), ECast(_, _), EBinop(_, _, _), EUnop(_, _, _), ENew(_, _), EParenthesis(_): Expr;
             case ECall(_, _): EitherKind;
             case _: trace('unknown kind for:', expr); EitherKind;
+        }
+    }
+
+    public function hasSideEffects(expr: HaxeExpr, scope: PreprocessorScope): Bool {
+        return switch expr.def {
+            // TODO: we always assume ECall(...) has side effects, even if that is not the case. If we were to introduce a lookup then the preprocessor can't parralelise per unit (dump file)...
+            // is there a way in which we can get the best of both worlds (per unit parallelisation AND side effect flag lookup)?
+            // we could potentially make the preprocessor a step after transformation has completed, but, that would significantly complicate the transformation process which we also don't want :(
+            case EBinop(OpAssign, _, _), EBinop(OpAssignOp(_), _, _), EUnop(OpIncrement, _, _), EUnop(OpDecrement, _, _), ECall(_, _), ENew(_, _), EReturn(_), EBreak: true;
+            case EVars(vars):
+                for (v in vars) if (v.expr != null && hasSideEffects(v.expr, scope)) return true;
+                false;
+            case EBinop(_, e1, e2): hasSideEffects(e1, scope) || hasSideEffects(e2, scope);
+            case EUnop(_, _, e), EField(e, _, _), EParenthesis(e), ECast(e, _): hasSideEffects(e, scope);
+            case EBlock(exprs):
+                for (e in exprs) if (hasSideEffects(e, scope)) return true;
+                false;
+            case EIf(econd, eif, eelse):
+                hasSideEffects(econd, scope) || hasSideEffects(eif, scope) || (eelse != null && hasSideEffects(eelse, scope));
+            case EWhile(econd, ebody, _): hasSideEffects(econd, scope) || hasSideEffects(ebody, scope);
+            case EConst(_): false;
+            case _: trace('unknown if expr has side effects'); true;
         }
     }
 
