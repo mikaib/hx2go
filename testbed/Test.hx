@@ -30,26 +30,20 @@ class Test {
         //};
 
         // Test: While Conditional Block
-        var count = 0;
-        while ({
-            var curr = count;
-            var max = 10;
-            curr < max;
-        }) {
-            count++;
-            ++count;
-        }
+        //var count = 0;
+        //while ({
+        //    var curr = count;
+        //    var max = 10;
+        //    curr < max;
+        //}) count++;
 
         // Test: Processing in while conditional
-        var idx = 0;
-        while (idx++ < 10) {}
+        //var idx = 0;
+        //while (idx++ < 10) {}
 
         // Test: Conditional without special transformations
-        var q = 0;
-        while (q < 10) {
-            q++;
-            ++q;
-        }
+        //var q = 0;
+        //while (q < 10) q++;
 
         // Test: Basic If
         //var ifOutA = 0;
@@ -88,11 +82,18 @@ class Test {
         //    "F";
         //}
 
-        // Test: Stmt as Expr
+        // Test: EUnop(...) / OpAssignOp precedence
         //var newCount = 0;
         //var newCountA = newCount++;
         //var newCountB = ++newCount;
         //var newCountC = (newCount += 10);
         //var newCountD = newCount++ * ++newCount + newCount++;
+
+        // Test: EUnop(...) as Stmt vs Expr
+        var k = 0;
+        k++;
+        ++k;
+        var k0 = k++;
+        var k1= ++k;
     }
 }
