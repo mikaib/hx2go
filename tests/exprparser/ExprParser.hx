@@ -7,4 +7,5 @@ function run() {
     IntExpr.run();
     TreeNode.run();
     CFFlags.run();
+    Slice.run();
 }
