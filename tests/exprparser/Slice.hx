@@ -5,7 +5,7 @@ import sys.io.File;
 
 function run() {
     final parser = new ExprParser("DEBUG");
-    final lines = File.getContent("tests/exprparser/slice.txt").split("\n");
+    final lines = File.getContent(Util.normalizeCLRF("tests/exprparser/slice.txt")).split("\n");
     final object = parser.parseObject(lines);
     parser.printObject(object);
 }

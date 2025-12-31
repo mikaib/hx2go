@@ -5,7 +5,7 @@ import parser.dump.ExprParser;
 
 function run() {
     final parser = new ExprParser("DEBUG");
-    final haxeExpr = parser.parse(File.getContent("tests/exprparser/hello.txt").split("\n"));
+    final haxeExpr = parser.parse(Util.normalizeCLRF(File.getContent("tests/exprparser/hello.txt")).split("\n"));
     equals(haxeExpr != null, true);
     equals(haxeExpr.def != null, true);
     // goes through the entire expr and makes sure it is exactly equal to:

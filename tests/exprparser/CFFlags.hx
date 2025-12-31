@@ -5,7 +5,7 @@ import sys.io.File;
 
 function run() {
     final parser = new ExprParser("DEBUG");
-    final lines = File.getContent("tests/exprparser/cf_flags.txt").split("\n");
+    final lines = Util.normalizeCLRF(File.getContent("tests/exprparser/cf_flags.txt")).split("\n");
     final object = parser.parseObject(lines);
     // check to make sure that cf_flags is not caught at the end
     equals(object.objects.length, 1);
