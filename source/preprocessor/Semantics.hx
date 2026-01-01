@@ -1,12 +1,6 @@
 package preprocessor;
 
 import HaxeExpr;
-import HaxeExpr.HaxeTypeDefinition;
-import HaxeExpr.HaxeTypeDefinition;
-import haxe.macro.Expr.TypeDefinition;
-import haxe.macro.ComplexTypeTools;
-import haxe.macro.Expr;
-import transformer.exprs.*;
 
 enum ExprKind {
     Stmt;

@@ -2,11 +2,7 @@ package preprocessor;
 
 import HaxeExpr;
 import HaxeExpr.HaxeTypeDefinition;
-import HaxeExpr.HaxeTypeDefinition;
-import haxe.macro.Expr.TypeDefinition;
-import haxe.macro.ComplexTypeTools;
 import haxe.macro.Expr;
-import transformer.exprs.*;
 
 /**
  * Gets rid of the bulk of Haxe language features that make working with it a nightmare.
