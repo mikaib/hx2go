@@ -8,10 +8,10 @@ function run() {
     final lines = File.getContent(Util.normalizeCLRF("tests/exprparser/treeNode.txt")).split("\n");
     final object = parser.parseObject(lines);
     final object = object.objects.pop();
-    equals(object.def, "Block");
-    equals(object.objects[0].def, "If");
-    equals(object.objects[0].objects[1].def, "Then");
-    equals(object.objects[0].objects[1].objects[0].def, "Block");
+    assert(object.def, "Block");
+    assert(object.objects[0].def, "If");
+    assert(object.objects[0].objects[1].def, "Then");
+    assert(object.objects[0].objects[1].objects[0].def, "Block");
     parser.reset();
     parser.parse(lines);
 }

@@ -2,10 +2,10 @@ package language;
 
 function run() {
     trace("Immediate Constants\n");
-    equals(true, true);
-    equals(false, false);
-    equals("hello", "hello");
-    equals("", "");
-    equals(3.14, 3.14);
-    equals(0.0, 0.0);
+    assert(true, true);
+    assert(false, false);
+    assert("hello", "hello");
+    assert("", "");
+    assert(3.14, 3.14);
+    assert(0.0, 0.0);
 }

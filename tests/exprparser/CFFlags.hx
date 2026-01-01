@@ -8,7 +8,7 @@ function run() {
     final lines = Util.normalizeCLRF(File.getContent("tests/exprparser/cf_flags.txt")).split("\n");
     final object = parser.parseObject(lines);
     // check to make sure that cf_flags is not caught at the end
-    equals(object.objects.length, 1);
-    equals(object.objects[0].objects.length, 1);
+    assert(object.objects.length, 1);
+    assert(object.objects[0].objects.length, 1);
     parser.printObject(object);
 }

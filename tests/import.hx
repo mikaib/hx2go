@@ -1,1 +1,1 @@
-import MacroTest.equals;
+import MacroTest.assert;

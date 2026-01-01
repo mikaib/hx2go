@@ -4,20 +4,22 @@ import haxe.macro.Expr;
 import haxe.macro.ExprTools;
 
 class MacroTest {
-    public static macro function equals(actual:Expr, expected:Expr):Expr {
+    public static macro function assert(actual:Expr, expected:Expr):Expr {
         var name = ExprTools.toString(actual);
         final pos = Context.currentPos();
         final expr = macro {
-                final name = $v{name};
-                if ($actual == $expected) {
-                @:pos(pos) trace('  ${TestAll.green("[OK]")} $name');
-                TestAll.passed++;
-            } else {
-                final actual = $actual;
-                final expected = $expected;
-                @:pos(pos) trace('  ${TestAll.red("[FAIL]")} $name: got $actual, want $expected');
-                TestAll.failed++;
-            };
+            final name = $v{name};
+            final actual = $actual;
+            final expected = $expected;
+            switch deepequal.DeepEqual.compare(expected, actual) {
+                case Success(_): // they are value-identical
+                    @:pos(pos) trace('  ${TestAll.green("[OK]")} $name');
+                    TestAll.passed++;
+                case Failure(f): 
+                    // trace(f.message, f.data); // they are different!
+                    @:pos(pos) trace('  ${TestAll.red("[FAIL]")} $name: ${f.message}');
+                    TestAll.failed++;
+            }
         };
         return expr;
     }
