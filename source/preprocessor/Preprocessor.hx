@@ -81,7 +81,7 @@ class Preprocessor {
                 insertExprs([ expr ], body, 0, localScope);
                 processExpr(expr, scope);
 
-                cond.def = EConst(CIdent('true'));
+                cond.def = null;
             }
 
             // default
