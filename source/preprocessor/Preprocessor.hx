@@ -38,6 +38,44 @@ class Preprocessor {
             case EBinop(op, e0, e1) if (op != OpAssign && !op.match(OpAssignOp(_))): Semantics.ensure(e, [e0, e1], this, localScope);
             case ECall(_, params): Semantics.ensure(e, params, this, localScope);
 
+            // prefix unop inc/dec as stmt
+            // we do not care about the result so we transform it to a postFix unop
+            case EUnop(op, false, l) if (op == OpIncrement || op == OpDecrement): {
+                e.def = EUnop(op, true, l);
+                iterateExprPost(e, localScope);
+            }
+
+            // normalise body
+
+            // extract while loop conditional to the body so that extraction makes sense
+            case EWhile(cond, body, norm): {
+                ensureBlock(body);
+                var expr: HaxeExpr = {
+                    t: null,
+                    def: EIf(
+                        {
+                            t: null,
+                            def: EUnop(OpNot, false, cond.copy())
+                        },
+                        {
+                            t: null,
+                            def: EBlock([
+                                {
+                                    t: null,
+                                    def: EBreak
+                                }
+                            ])
+                        },
+                        null
+                    )
+                };
+
+                insertExprs([ expr ], body, 0, localScope);
+                processExpr(expr, scope);
+
+                cond.def = EConst(CIdent('true'));
+            }
+
             // default
             case _: iterateExprPost(e, localScope);
         }
@@ -217,6 +255,17 @@ class Preprocessor {
     public function insertExprsBefore(exprs: Array<HaxeExpr>, p: HaxeExpr, scope: Scope) {
         var pos = getOuterBlock(p);
         insertExprs(exprs, pos.block, pos.at, scope);
+    }
+
+    public function ensureBlock(e: HaxeExpr) {
+        if (e == null) {
+            return;
+        }
+
+        e.def = switch (e.def) {
+            case EBlock(_): e.def;
+            case _: EBlock([e.copy()]);
+        }
     }
 
 }

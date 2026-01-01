@@ -11,44 +11,44 @@ import go.Fmt;
 class Test {
     public static function main() {
         // Test: Blocks
-        //var resA = {
-        //    var x: Int32 = 5;
-        //    var y: Float32 = 10.0;
-        //    x + y;
-        //};
+        var resA = {
+            var x: Int32 = 5;
+            var y: Float32 = 10.0;
+            x + y;
+        };
 
-        //var resB = {
-        //    var x: Int32 = 20;
-        //    var y: Float32 = 40.0;
-        //    x + y;
-        //};
+        var resB = {
+            var x: Int32 = 20;
+            var y: Float32 = 40.0;
+            x + y;
+        };
 
         // Test: Nested Blocks
-        //var resC = {
-        //    var x: Int32 = 5;
-        //    var y: Float32 = {
-        //        var z: Int32 = 10;
-        //        var w: Float32 = 20;
-        //        z * w;
-        //    }
-        //    x + y;
-        //};
+        var resC = {
+            var x: Int32 = 5;
+            var y: Float32 = {
+                var z: Int32 = 10;
+                var w: Float32 = 20;
+                z * w;
+            }
+            x + y;
+        };
 
         // Test: While Conditional Block
-        //var count = 0;
-        //while ({
-        //    var curr = count;
-        //    var max = 10;
-        //    curr < max;
-        //}) count++;
+        var count = 0;
+        while ({
+            var curr = count;
+            var max = 10;
+            curr < max;
+        }) count++;
 
         // Test: Processing in while conditional
-        //var idx = 0;
-        //while (idx++ < 10) {}
+        var idx = 0;
+        while (idx++ < 10) {}
 
         // Test: Conditional without special transformations
-        //var q = 0;
-        //while (q < 10) q++;
+        var q = 0;
+        while (q < 10) q++;
 
         // Test: Shadowing
         //var shadow = 0; shadow = 5;
@@ -56,11 +56,12 @@ class Test {
         //var shadow = true; shadow = false;
 
         // Test: Pointers
-        //var x: Int32 = 5;
-        //var y: go.Pointer<Int32> = go.Pointer.addressOf(x);
-        //var z: Int = y.value;
-        //y.value += 10;
-        //go.Fmt.Println(y, y.value, x, z);
+        var valA: Int32 = 5;
+        var ptrA: go.Pointer<Int32> = go.Pointer.addressOf(valA);
+        var valB: Int32 = ptrA.value;
+        ptrA.value += 10;
+        var valC: Int32 = ptrA.value;
+        go.Fmt.Println(ptrA, valA, valB, valC);
 
         // Test: Basic If
         //var ifOutA = 0;
@@ -100,11 +101,12 @@ class Test {
         //}
 
         // Test: EUnop(...) / OpAssignOp precedence
-        //var newCount = 0;
-        //var newCountA = newCount++;
-        //var newCountB = ++newCount;
-        //var newCountC = (newCount += 10);
-        //var newCountD = newCount++ * ++newCount + newCount++;
+        var newCount = 0;
+        var newCountA = newCount++;
+        var newCountB = ++newCount;
+        var newCountC = (newCount += 10);
+        var newCountD = newCount++ * ++newCount + newCount++;
+        go.Fmt.Println(newCount, newCountA, newCountB, newCountC, newCountD);
 
         // Test: EUnop(...) as Stmt vs Expr
         var k = 0;
@@ -114,15 +116,15 @@ class Test {
         var k1 = ++k;
 
         // Test: extracting `l` in `l = l + ...` if right-side is extracted
-        //var l = 5;
-        //var r = 3;
-        //l = l + (r = l + r) * (l = l + r);
-        //go.Fmt.Println(l, r);
+        var l = 5;
+        var r = 3;
+        l = l + (r = l + r) * (l = l + r);
+        go.Fmt.Println(l, r);
 
         // Test: ensuring semantics in calls
-        //var n = 5; go.Fmt.Println(n, n = n + 3, n);
-        //n = 5; go.Fmt.Println(n, n++, n);
-        //n = 5; go.Fmt.Println(n, n += 5, n);
-        //n = 5; go.Fmt.Println(n, n + 5, n);
+        var n = 5; go.Fmt.Println(n, n = n + 3, n);
+        n = 5; go.Fmt.Println(n, n++, n);
+        n = 5; go.Fmt.Println(n, n += 5, n);
+        n = 5; go.Fmt.Println(n, n + 5, n);
     }
 }

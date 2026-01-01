@@ -58,6 +58,8 @@ class Translator {
                     Untyped.translateUntyped(this, e);
                 case ECast(e, t):
                     Cast.translateCast(this, e, t);
+                case EBreak:
+                    Break.translateBreak(this);
                 default:
                     "_ = 0";
             }

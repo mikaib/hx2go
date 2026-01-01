@@ -4,5 +4,5 @@ import translator.Translator;
 import HaxeExpr;
 
 function translateBreak(t:Translator) {
-    
-} 
+    return "break";
+}

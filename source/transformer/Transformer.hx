@@ -163,16 +163,6 @@ class Transformer {
                 transformExpr(field.expr);
         }
     }
-    public function ensureBlock(e:HaxeExpr):HaxeExpr {
-        if (e == null) {
-            return null;
-        }
-
-        return switch (e.def) {
-            case EBlock(_): e;
-            case _: { t: null, def: EBlock([e]) };
-        }
-    }
     public extern inline overload function exprToString(e:haxe.macro.Expr):String {
         return switch e.expr {
             case EConst(CIdent(s)), EConst(CString(s)):
