@@ -1,5 +1,7 @@
 package go;
 
+import go.Star;
+
 @:coreType
 @:runtimeValue
 abstract Pointer<T> {

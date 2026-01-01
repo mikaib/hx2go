@@ -56,11 +56,11 @@ class Test {
         //var shadow = true; shadow = false;
 
         // Test: Pointers
-        //var x: Int32 = 5;
-        //var y: go.Pointer<Int32> = go.Pointer.addressOf(x);
-        //var z: Int = y.value;
-        //y.value += 10;
-        //go.Fmt.Println(y, y.value, x, z);
+        var x: Int32 = 5;
+        var y: go.Pointer<Int32> = go.Pointer.addressOf(x);
+        var z: Int = y.value;
+        y.value += 10;
+        go.Fmt.Println(y, y.value, x, z);
 
         // Test: Basic If
         //var ifOutA = 0;
