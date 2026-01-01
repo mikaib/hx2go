@@ -21,6 +21,34 @@ class Annonymiser {
     }
 
     /**
+     * Creates a temporary variable and gives back the decl / ident.
+     * @param e The expression to be assigned to a temporary variable
+     */
+    public function assign(e: HaxeExpr): { decl: HaxeExpr, ident: HaxeExpr } {
+        var id = _tempId++;
+        var name = getName(id);
+
+        return {
+            decl: {
+                t: null,
+                def: EVars([
+                    {
+                        name: name,
+                        expr: e,
+                        annonymous: true
+                    }
+                ])
+            },
+            ident: {
+                t: null,
+                def: EConst(CIdent(name)),
+                parent: e.parent,
+                parentIdx: e.parentIdx
+            }
+        };
+    }
+
+    /**
      * Returns the temporary name for any given ID.
      * @param id The ID of the temporary.
      */

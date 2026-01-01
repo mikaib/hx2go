@@ -1,5 +1,6 @@
 package;
 
+import preprocessor.Scope;
 import haxe.runtime.Copy;
 import haxe.macro.Expr;
 
@@ -10,6 +11,7 @@ enum abstract HaxeExprFlags(Int) from Int to Int {
 @:structInit
 class HaxeExpr {
 	public var remapTo:Null<String> = null;
+	public var scope: Scope = null;
 	public var parent:HaxeExpr = null;
 	public var parentIdx:Int = 0;
 	public var flags:HaxeExprFlags = 0;

@@ -11,6 +11,53 @@ enum ExprKind {
 class Semantics {
 
     /**
+     * Given a parent and it's children, it will ensure that if any reordering happens that it correctly maintains the original semantics.
+     * **WARNING!** This function will mutate expressions in place! Be careful about where and when you call this function!!
+     * @param p The parent
+     * @param children Children of the parent (the list on which it will ensure semantics are maintained)
+     * @param ctx The preprocessor in which this function got called from
+     * @param scope The scope of the current expression
+     */
+     public static function ensure(p: HaxeExpr, children: Array<HaxeExpr>, ctx: Preprocessor, scope: Scope): Void {
+        var willMutate = false;
+        for (c in children) {
+            willMutate = willMutate || hasSideEffects(c) || goingToMutate(c, p);
+        }
+
+        if (!willMutate) {
+            ctx.iterateExprPost(p, scope);
+            return;
+        }
+
+        var idx = 0;
+        for (c in children) {
+            if (goingToMutate(c, p)) ctx.processExpr(c, scope);
+            else {
+                var tmp = ctx.annonymiser.assign(c.copy());
+                ctx.insertExprsBefore([ tmp.decl ], p, scope);
+                ctx.processExpr(tmp.decl, scope);
+
+                c.def = tmp.ident.def;
+            }
+        }
+     }
+
+     /**
+      * Checks if any conversion will be done on `e`
+      * @param e The expression to check
+      * @param parent The parent in which `e` is held
+      */
+     public static function goingToMutate(e: HaxeExpr, parent: HaxeExpr): Bool {
+        var res = !canHold(parent, e);
+
+        HaxeExprTools.iter(e, (l) -> {
+            res = res || goingToMutate(l, e);
+        });
+
+        return res;
+     }
+
+    /**
      * Given the expression `expr` this function will return one of the following cases:
      * Stmt - Something that can only be used as a statement, like `EVars(...)`
      * Expr - Something that can only be used as an expression.
