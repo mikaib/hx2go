@@ -91,6 +91,10 @@ class Test {
         //var score = 65;
         //var passed = score > 70 ? "you passed" : "you failed";
 
+        // Test: null coal
+        //var strA: String = null;
+        //var strB: String = strA ?? "null coal works!";
+
         // Test: If as expr
         //var grade = if (score == 100) {
         //    "A+";

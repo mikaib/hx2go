@@ -7,6 +7,10 @@ import haxe.macro.Expr;
 /**
  * Gets rid of the bulk of Haxe language features that make working with it a nightmare.
  * The difference compared to the transformer is that the transformer converts things to work and the preprocessor removes things.
+ * TODO:
+ * - Short Circuiting (taking into account EIE)
+ * - EIf(...)
+ * - Test: x[i++] = i;
  */
 @:structInit
 class Preprocessor {
