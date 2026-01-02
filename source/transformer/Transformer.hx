@@ -99,6 +99,7 @@ class Transformer {
                                 case "go.Rune": "rune";
                                 case "go.Byte": "byte";
                                 case "go.Slice": '[]${transformComplexTypeParam(p.params, 0)}';
+                                case "go.Pointer": '*${transformComplexTypeParam(p.params, 0)}';
                                 case "Bool": "bool";
                                 case _:
                                     trace("unhandled coreType: " + td.name);
@@ -117,6 +118,11 @@ class Transformer {
                         case ":go.package":
                             def.addGoImport(exprToString(meta.params[0]));
                     }
+                }
+
+                p.name = switch (td.name) {
+                    case "String": "string"; // string doesn't have @:coreType
+                    case _: p.name;
                 }
             default:
         }
@@ -160,16 +166,6 @@ class Transformer {
             }
             if (field.expr != null)
                 transformExpr(field.expr);
-        }
-    }
-    public function ensureBlock(e:HaxeExpr):HaxeExpr {
-        if (e == null) {
-            return null;
-        }
-
-        return switch (e.def) {
-            case EBlock(_): e;
-            case _: { t: null, def: EBlock([e]) };
         }
     }
     public extern inline overload function exprToString(e:haxe.macro.Expr):String {

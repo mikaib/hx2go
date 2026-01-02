@@ -1,5 +1,7 @@
 package;
 
+import preprocessor.Scope;
+import haxe.runtime.Copy;
 import haxe.macro.Expr;
 
 enum abstract HaxeExprFlags(Int) from Int to Int {
@@ -9,6 +11,7 @@ enum abstract HaxeExprFlags(Int) from Int to Int {
 @:structInit
 class HaxeExpr {
 	public var remapTo:Null<String> = null;
+	public var scope: Scope = null;
 	public var parent:HaxeExpr = null;
 	public var parentIdx:Int = 0;
 	public var flags:HaxeExprFlags = 0;
@@ -21,7 +24,7 @@ class HaxeExpr {
 			parent: deep ? parent.copy() : parent,
 			parentIdx: parentIdx,
 			flags: flags,
-			def: def,
+			def: def, // Copy.copy(def),
 			t: t
 		};
 	}
@@ -214,7 +217,7 @@ enum HaxeExprDef {
 	/**
 	    A Go code block, created from Syntax.code
 	**/
-	EGoCode(format:String, args:Array<HaxeExpr>, statement: Bool);
+	EGoCode(format:String, args:Array<HaxeExpr>);
 
     /**
         The Go expression to create a new slice
@@ -364,6 +367,11 @@ typedef HaxeVar = {
 		Metadata associated with the variable, if available.
 	**/
 	var ?meta:Metadata;
+
+	/**
+	    (hx2go internal) If the variable has been annoymised already.
+    **/
+    var ?annonymous:Bool;
 }
 
 /**
