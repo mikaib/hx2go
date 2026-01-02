@@ -1,9 +1,7 @@
--cp source
+common.hxml
 -m Main
 # haxelib git hxparse https://github.com/Simn/hxparse
 # haxelib git haxeparser https://github.com/HaxeCheckstyle/haxeparser
--lib hxparse
--lib haxeparser
 --dce full
 -D hx2go-main=Test
 -D build-go
