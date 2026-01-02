@@ -70,45 +70,49 @@ class Test {
         go.Fmt.Println(ptrA, valA, valB, valC);
 
         // Test: Basic If
-        //var ifOutA = 0;
-        //if ({
-        //    var a = 5;
-        //    var b = 10;
-        //    a > b;
-        //}) {
-        //    ifOutA = 1;
-        //} else if ({
-        //    var x = 10;
-        //    var y = 5;
-        //    x != y;
-        //}) {
-        //    ifOutA = 2;
-        //} else {
-        //    ifOutA = 3;
-        //}
+        var ifOutA = 0;
+        if ({
+            var a = 5;
+            var b = 10;
+            a > b;
+        }) {
+            ifOutA = 1;
+        } else if ({
+            var x = 10;
+            var y = 5;
+            x != y;
+        }) {
+            ifOutA = 2;
+        } else {
+            ifOutA = 3;
+        }
+
+        go.Fmt.Println(ifOutA);
 
         // Test: Ternary
-        //var score = 65;
-        //var passed = score > 70 ? "you passed" : "you failed";
+        var score = 75;
+        var passed = score > 70 ? "you passed" : "you failed";
 
         // Test: null coal
-        //var strA: String = null;
-        //var strB: String = strA ?? "null coal works!";
+        var strA: String = null;
+        var strB: String = strA ?? "null coal works!";
 
         // Test: If as expr
-        //var grade = if (score == 100) {
-        //    "A+";
-        //} else if (score >= 90) {
-        //    "A";
-        //} else if (score >= 80) {
-        //    "B";
-        //} else if (score >= 70) {
-        //    "C";
-        //} else if (score >= 60) {
-        //    "D";
-        //} else {
-        //    "F";
-        //}
+        var grade = if (score == 100) {
+            "A+";
+        } else if (score >= 90) {
+            "A";
+        } else if (score >= 80) {
+            "B";
+        } else if (score >= 70) {
+            "C";
+        } else if (score >= 60) {
+            "D";
+        } else {
+            "F";
+        }
+
+        go.Fmt.Println(score, passed, grade, strB);
 
         // Test: EUnop(...) / OpAssignOp precedence
         var newCount = 0;

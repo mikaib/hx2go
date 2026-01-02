@@ -119,6 +119,11 @@ class Transformer {
                             def.addGoImport(exprToString(meta.params[0]));
                     }
                 }
+
+                p.name = switch (td.name) {
+                    case "String": "string"; // string doesn't have @:coreType
+                    case _: p.name;
+                }
             default:
         }
     }

@@ -24,7 +24,7 @@ class Annonymiser {
      * Creates a temporary variable and gives back the decl / ident.
      * @param e The expression to be assigned to a temporary variable
      */
-    public function assign(e: HaxeExpr): { decl: HaxeExpr, ident: HaxeExpr } {
+    public function assign(e: HaxeExpr, ?type: String): { decl: HaxeExpr, ident: HaxeExpr } {
         var id = _tempId++;
         var name = getName(id);
 
@@ -35,15 +35,16 @@ class Annonymiser {
                     {
                         name: name,
                         expr: e,
-                        annonymous: true
+                        annonymous: true,
+                        type: type != null ? HaxeExprTools.stringToComplexType(type) : null
                     }
                 ])
             },
             ident: {
                 t: null,
                 def: EConst(CIdent(name)),
-                parent: e.parent,
-                parentIdx: e.parentIdx
+                parent: e?.parent,
+                parentIdx: e?.parentIdx ?? 0
             }
         };
     }

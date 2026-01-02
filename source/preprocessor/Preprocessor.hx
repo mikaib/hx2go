@@ -9,7 +9,6 @@ import haxe.macro.Expr;
  * The difference compared to the transformer is that the transformer converts things to work and the preprocessor removes things.
  * TODO:
  * - Short Circuiting (taking into account EIE)
- * - EIf(...)
  * - Test: x[i++] = i;
  */
 @:structInit
@@ -176,6 +175,43 @@ class Preprocessor {
                 iterateExprPost(copy, scope);
                 insertExprsBefore([
                     copy.copy(), tmp.decl
+                ], copy, scope);
+
+                result = tmp.ident;
+            }
+
+            case EIf(econd, eif, eelse): {
+                ensureParenthesis(econd);
+                ensureBlock(eif);
+                ensureBlock(eelse);
+
+                var tmp = annonymiser.assign(null, stmt.t);
+                var ifStmt = copy.copy();
+                var makeLastAssign = (eBranch: HaxeExpr) -> {
+                    var arr = switch(eBranch.def) {
+                        case EBlock(x): x;
+                        case _: null;
+                    }
+
+                    if (arr == null) {
+                        trace('makeLastAssign branch is not a block');
+                        return;
+                    }
+
+                    if (arr.length == 0) {
+                        return; // empty branch
+                    }
+
+                    var last = arr[arr.length - 1];
+                    last.def = EBinop(OpAssign, tmp.ident, last.copy());
+                };
+
+                makeLastAssign(eif);
+                if (eelse != null) makeLastAssign(eelse);
+
+                iterateExprPost(ifStmt, scope);
+                insertExprsBefore([
+                    tmp.decl, ifStmt
                 ], copy, scope);
 
                 result = tmp.ident;
