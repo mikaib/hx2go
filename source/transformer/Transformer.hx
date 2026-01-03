@@ -101,6 +101,7 @@ class Transformer {
                                 case "go.Slice": '[]${transformComplexTypeParam(p.params, 0)}';
                                 case "go.Pointer": '*${transformComplexTypeParam(p.params, 0)}';
                                 case "Bool": "bool";
+                                case "Dynamic": "map[string]dynamic";
                                 case _:
                                     trace("unhandled coreType: " + td.name);
                                     "#UNKNOWN_TYPE";
