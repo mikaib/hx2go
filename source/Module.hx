@@ -12,6 +12,7 @@ class Module {
     public var mainBool:Bool = false;
     public var path:String;
     public var defs:Array<HaxeTypeDefinition> = [];
+    public var imports:Array<String> = [];
     public var preprocessor:Preprocessor;
     public var transformer:Transformer;
     public var translator:Translator;
@@ -74,6 +75,15 @@ class Module {
     public function addDef(def:HaxeTypeDefinition) {
         defs.push(def);
     }
+
+    public function addImport(modulePath:String) {
+        switch modulePath {
+            // TODO restrict certain modules from ever being generated
+            case "go.Syntax", "StdTypes":
+                return; 
+        }
+        imports.push(modulePath);
+    }
     /**
      * After all defs are added, Transformer -> Translator -> Printer
      */
@@ -84,9 +94,7 @@ class Module {
         preprocessor.module = this;
         //trace(path, defs.length);
 
-        final paths = path.split(".");
-        final lastPath = paths[paths.length - 1];
-        paths[paths.length - 1] = lastPath.charAt(0).toLowerCase() + lastPath.substr(1);
+        final paths = toGoPath(path);
         final lastPathLowercase = paths[paths.length - 1];
         final dir = context.options.output + "/" + paths.join("/");
         if (!FileSystem.exists(dir))
@@ -98,6 +106,10 @@ class Module {
             File.saveContent(context.options.output + "/main.go", 'package main\nimport "hx2go/$importPath"\nfunc main() {\n' + lastPathLowercase + ".Main()\n}");
         }
         var prefixString = "package " + paths.join("/") + "\n";
+        for (imp in imports) {
+            imp = toGoPath(imp).join("/");
+            prefixString += 'import "hx2go/$imp"\n';
+        }
         for (def in defs) {
             if (def == null)
                 continue;
@@ -112,6 +124,13 @@ class Module {
             // imports
             File.saveContent(dir + "/" + toCamelCase(def.name) + ".go", prefixString + content);
         }
+    }
+
+    public function toGoPath(path:String):Array<String> {
+        final paths = path.split(".");
+        final lastPath = paths[paths.length - 1];
+        paths[paths.length - 1] = lastPath.charAt(0).toLowerCase() + lastPath.substr(1);
+        return paths;
     }
 
     private function printFile(s:String) {
