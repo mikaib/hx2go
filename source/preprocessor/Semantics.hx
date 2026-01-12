@@ -122,6 +122,8 @@ class Semantics {
 			case EConst(_), EField(_, _, _), ECast(_, _), EBinop(_, _, _), EUnop(_, _, _), ENew(_, _), EParenthesis(_): Expr;
 			case EArray(_): Expr;
 			case ECall(_, _): EitherKind;
+			case EFunction(_, _): Expr;
+			case EArrayDecl(_): Expr;
 			case _:
 				trace('unknown kind for:', expr);
 				EitherKind;
