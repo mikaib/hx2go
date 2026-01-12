@@ -157,12 +157,8 @@ class Transformer {
             return;
         for (field in def.fields) {
             switch field.kind {
-                case FFun(_):
-                    if (field?.expr?.def == null)
-                        field.expr = {
-                            t: null,
-                            def: EBlock([]),
-                        };
+                case FFun(f):
+                    transformer.decls.Function.typeFunction(this, field.name, f);
                 default:
             }
             if (field.expr != null)
