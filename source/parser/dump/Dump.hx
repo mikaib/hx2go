@@ -69,10 +69,8 @@ class Dump implements IParser {
             final module = cache.get(modulePath);
             if (module == null)
                 continue;
-            trace(modulePath);
             for (fileName in files) {
                 final imp = fileNameToModulePath[fileName];
-                trace(fileName, imp);
                 // assume import is null means the compiler is fine to skip it and is only in eval
                 if (imp == null)
                     continue;
