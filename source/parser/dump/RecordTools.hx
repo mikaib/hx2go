@@ -1,5 +1,6 @@
 package parser.dump;
 
+import haxe.macro.Expr.TypeParamDecl;
 import haxe.macro.Expr.MetadataEntry;
 import haxe.Json;
 import HaxeExpr.HaxeTypeDefinition;
@@ -80,10 +81,14 @@ private function getMeta(list:Array<String>):Array<MetadataEntry> {
 
 private function recordClassFieldToHaxeField(record_debug_path:String, field:RecordClassField, isStatic:Bool):HaxeField {
     final kind:HaxeFieldKind = switch field.kind {
-        case "method":
-            FFun({args: []});
-        case "dynamic method", "inline method":
-            FFun({args: []});
+        case "method", "dynamic method", "inline method":
+            final params:Array<TypeParamDecl> = [];
+            for (param in field.params) {
+                params.push({
+                    name: param.get("name"),
+                });
+            }
+            FFun({args: [], params: params});
         case "var":
             FVar;
         case _ if (field.kind == null):
