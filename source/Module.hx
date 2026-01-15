@@ -21,9 +21,8 @@ class Module {
     public function resolveLocalDef(module:Module, name:String) {
         for (def in module.defs) {
                 switch def.kind {
-                case TDClass:
-                    if (def.name == name)
-                        return def;
+                case TDClass if (def.name == name):
+                    return def;
                 default:
             }
         }
