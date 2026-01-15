@@ -77,11 +77,15 @@ class Module {
     }
 
     public function addImport(modulePath:String) {
+        // 
         switch modulePath {
-            // TODO restrict certain modules from ever being generated
-            case "go.Syntax", "StdTypes":
-                return; 
+            case "StdTypes":
+                return;
         }
+        final td = resolveClass([], modulePath);
+        // prevent import if typedef is extern
+        if (td != null && td.isExtern)
+            return;
         imports.push(modulePath);
     }
     /**
@@ -121,6 +125,9 @@ class Module {
             transformer.transformDef(def);
             // translate
             var content = translator.translateDef(def);
+            // skip externs from generation
+            if (def.isExtern)
+                continue;
             // imports
             File.saveContent(dir + "/" + toCamelCase(def.name) + ".go", prefixString + content);
         }
