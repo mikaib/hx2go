@@ -18,6 +18,25 @@ class Module {
     public var translator:Translator;
     public var context:Context;
 
+
+    public function canResolveLocalTypeParam(funcName:String, typeName:String):Bool {
+        for (def in this.defs) {
+            for (field in def.fields) {
+                switch field.kind {
+                    case FFun(f) if (f.params != null && f.params.length > 0):
+                        for (param in f.params) {
+                            if (param.name == typeName && field.name == toCamelCase(funcName)) {
+                                return true;
+                            }
+                        }
+                    default:
+                        continue;
+                }
+            }
+        }
+        return false;
+    }
+
     public function resolveLocalDef(module:Module, name:String) {
         for (def in module.defs) {
                 switch def.kind {
@@ -36,8 +55,10 @@ class Module {
                 final module = context.getModule("StdTypes");
                 return resolveGlobalDef(module, name);
             default:
+                // top level
                 final sameNameModule = context.getModule(name);
-                return resolveGlobalDef(sameNameModule, name);
+                final globalDef = resolveGlobalDef(sameNameModule, name);
+                return globalDef;
         }
         trace("not resolving def: " + module + " " + name);
         return null;
@@ -75,16 +96,30 @@ class Module {
         defs.push(def);
     }
 
+    function hasGoPackageMetadata(td:HaxeTypeDefinition) {
+        for (meta in td.meta()) {
+            switch meta.name {
+                case ":go.package":
+                    return true;
+            }
+        }
+        return false;
+    }
+
     public function addImport(modulePath:String) {
         // 
         switch modulePath {
-            case "StdTypes":
+            case "StdTypes", "go.Syntax":
                 return;
         }
         final td = resolveClass([], modulePath);
         // prevent import if typedef is null
-        if (td != null)
+        if (td == null) {
             return;
+        }else{
+            if (hasGoPackageMetadata(td))
+                return;
+        }
         imports.push(modulePath);
     }
     /**
@@ -122,6 +157,8 @@ class Module {
             preprocessor.processDef(def);
             // transformer pass
             transformer.transformDef(def);
+            if (hasGoPackageMetadata(def))
+                continue;
             // translate
             var content = translator.translateDef(def);
             // imports
