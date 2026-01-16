@@ -8,4 +8,5 @@ function run() {
     TreeNode.run();
     CFFlags.run();
     Slice.run();
+    RestKeyValueIterator.run();
 }

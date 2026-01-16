@@ -14,6 +14,7 @@
 								[Const:Bool] true
 							[Then:Int] [Const:Int] 0
 				[If:Void]
+					[Then:Int] [Block:Int] [Const:Int] 0
 					[Else:Int] [Binop:Int]
 						[Field:Int]
 							[Const:haxe.ds.TreeNode<haxe.ds.TreeNode.K, haxe.ds.TreeNode.V>] this

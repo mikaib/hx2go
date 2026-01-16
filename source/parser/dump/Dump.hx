@@ -30,15 +30,18 @@ class Dump implements IParser {
             records.push(record);
         }
 
+        final depsMap = Deps.run("./dump/go/dependencies.dump");
+        final fileNameToModulePath:Map<String,String> = [];
+        final cache = _context.getCache();
+
         for (record in records) {
             if (record?.module == null) {
                 trace("module should not be null");
                 continue;
             }
 
-            final cache = _context.getCache();
             final def = RecordTools.recordToHaxeTypeDefinition(record);
-            if (!cache.exists(record.module)) {
+            final module = if (!cache.exists(record.module)) {
                 var module: Module = {
                     path: record.module,
                     translator: {},
@@ -47,10 +50,31 @@ class Dump implements IParser {
                     context: _context,
                 };
                 cache.set(record.module, module);
-                module.addDef(def);
+                module;
             }else{
                 // module already exists, add a new def to it
-                cache.get(record.module).addDef(def);
+                cache.get(record.module);
+            }
+            module.addDef(def);
+            // add to deps module key map
+            fileNameToModulePath[record.name_pos.file] = record.module;
+            
+        }
+        for (fileName => files in depsMap) {
+            final modulePath = fileNameToModulePath[fileName];
+            // assume modulePath is null means the compiler is fine to skip it and is only in eval
+            if (modulePath == null) {
+                continue;
+            }
+            final module = cache.get(modulePath);
+            if (module == null)
+                continue;
+            for (fileName in files) {
+                final imp = fileNameToModulePath[fileName];
+                // assume import is null means the compiler is fine to skip it and is only in eval
+                if (imp == null)
+                    continue;
+                module.addImport(imp);
             }
         }
     }

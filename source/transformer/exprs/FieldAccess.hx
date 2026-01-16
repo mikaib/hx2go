@@ -44,6 +44,7 @@ function resolveExpr(t:Transformer, e2:HaxeExpr): Bool {
                     switch p.params[0] {
                         case TPType(TPath(p)):
                             final td = t.module.resolveClass(p.pack, p.name);
+                            renamedIdent = t.module.toGoPath(td.module).join(".");
                             if (td != null) {
                                 for (meta in td.meta()) {
                                     switch meta.name {

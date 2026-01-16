@@ -75,7 +75,14 @@ class Transformer {
                     return;
                 final td = module.resolveClass(p.pack, p.name);
                 if (td == null) {
-                    trace('td is null in transformComplexType for' + ct);
+                    // check if function generic
+                    if (p.pack.length == 1) {
+                        if (module.canResolveLocalTypeParam(p.pack[0], p.name)) {
+                            p.pack = [];
+                        }
+                    }else{
+                        trace('td is null in transformComplexType for' + ct);
+                    }
                     return;
                 }
 
@@ -101,6 +108,7 @@ class Transformer {
                                 case "go.Slice": '[]${transformComplexTypeParam(p.params, 0)}';
                                 case "go.Pointer": '*${transformComplexTypeParam(p.params, 0)}';
                                 case "Bool": "bool";
+                                case "Dynamic": "map[string]dynamic";
                                 case _:
                                     trace("unhandled coreType: " + td.name);
                                     "#UNKNOWN_TYPE";
@@ -122,6 +130,7 @@ class Transformer {
 
                 p.name = switch (td.name) {
                     case "String": "string"; // string doesn't have @:coreType
+                    case "Unknown": "any"; // must be resolved in Go
                     case _: p.name;
                 }
             default:
@@ -156,12 +165,14 @@ class Transformer {
             return;
         for (field in def.fields) {
             switch field.kind {
-                case FFun(_):
-                    if (field?.expr?.def == null)
-                        field.expr = {
-                            t: null,
-                            def: EBlock([]),
-                        };
+                case FFun({params: params}):
+                    switch field.expr.def {
+                        case EFunction(kind, f):
+                            // pass on the params
+                            f.params = params;
+                            transformer.decls.Function.transformFunction(this, field.name, f);
+                        default:
+                    }
                 default:
             }
             if (field.expr != null)

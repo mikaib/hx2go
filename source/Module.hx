@@ -12,17 +12,36 @@ class Module {
     public var mainBool:Bool = false;
     public var path:String;
     public var defs:Array<HaxeTypeDefinition> = [];
+    public var imports:Array<String> = [];
     public var preprocessor:Preprocessor;
     public var transformer:Transformer;
     public var translator:Translator;
     public var context:Context;
 
+
+    public function canResolveLocalTypeParam(funcName:String, typeName:String):Bool {
+        for (def in this.defs) {
+            for (field in def.fields) {
+                switch field.kind {
+                    case FFun(f) if (f.params != null && f.params.length > 0):
+                        for (param in f.params) {
+                            if (param.name == typeName && field.name == toCamelCase(funcName)) {
+                                return true;
+                            }
+                        }
+                    default:
+                        continue;
+                }
+            }
+        }
+        return false;
+    }
+
     public function resolveLocalDef(module:Module, name:String) {
         for (def in module.defs) {
                 switch def.kind {
-                case TDClass:
-                    if (def.name == name)
-                        return def;
+                case TDClass if (def.name == name):
+                    return def;
                 default:
             }
         }
@@ -36,6 +55,10 @@ class Module {
                 final module = context.getModule("StdTypes");
                 return resolveGlobalDef(module, name);
             default:
+                // top level
+                final sameNameModule = context.getModule(name);
+                final globalDef = resolveGlobalDef(sameNameModule, name);
+                return globalDef;
         }
         trace("not resolving def: " + module + " " + name);
         return null;
@@ -48,20 +71,21 @@ class Module {
                 switch def.kind {
                 case TDClass:
                     if (def.name == name)
-                    return def;
+                        return def;
                 default:
             }
         }
-        throw "not resolving def: " + name;
+        trace("WARNING not resolving def: " + name);
+        return null;
     }
 
     public function resolveClass(pack:Array<String>, name:String):HaxeTypeDefinition {
-        var resolveModule = pack.join(".") + (pack.length > 0 ? "." : "") + name;
         // trace(resolveModule);
         // local
         if (pack.length == 0) {
             return resolveLocalDef(this, name);
         }else{
+            final resolveModule = pack.join(".") + (pack.length > 0 ? "." : "") + name;
             // global
             final module = context.getModule(resolveModule);
             return resolveGlobalDef(module, resolveModule);
@@ -70,6 +94,33 @@ class Module {
 
     public function addDef(def:HaxeTypeDefinition) {
         defs.push(def);
+    }
+
+    function hasGoPackageMetadata(td:HaxeTypeDefinition) {
+        for (meta in td.meta()) {
+            switch meta.name {
+                case ":go.package":
+                    return true;
+            }
+        }
+        return false;
+    }
+
+    public function addImport(modulePath:String) {
+        // 
+        switch modulePath {
+            case "StdTypes", "go.Syntax":
+                return;
+        }
+        final td = resolveClass([], modulePath);
+        // prevent import if typedef is null
+        if (td == null) {
+            return;
+        }else{
+            if (hasGoPackageMetadata(td))
+                return;
+        }
+        imports.push(modulePath);
     }
     /**
      * After all defs are added, Transformer -> Translator -> Printer
@@ -81,9 +132,7 @@ class Module {
         preprocessor.module = this;
         //trace(path, defs.length);
 
-        final paths = path.split(".");
-        final lastPath = paths[paths.length - 1];
-        paths[paths.length - 1] = lastPath.charAt(0).toLowerCase() + lastPath.substr(1);
+        final paths = toGoPath(path);
         final lastPathLowercase = paths[paths.length - 1];
         final dir = context.options.output + "/" + paths.join("/");
         if (!FileSystem.exists(dir))
@@ -95,6 +144,10 @@ class Module {
             File.saveContent(context.options.output + "/main.go", 'package main\nimport "hx2go/$importPath"\nfunc main() {\n' + lastPathLowercase + ".Main()\n}");
         }
         var prefixString = "package " + paths.join("/") + "\n";
+        for (imp in imports) {
+            imp = toGoPath(imp).join("/");
+            prefixString += 'import "hx2go/$imp"\n';
+        }
         for (def in defs) {
             if (def == null)
                 continue;
@@ -104,11 +157,20 @@ class Module {
             preprocessor.processDef(def);
             // transformer pass
             transformer.transformDef(def);
+            if (hasGoPackageMetadata(def))
+                continue;
             // translate
             var content = translator.translateDef(def);
             // imports
             File.saveContent(dir + "/" + toCamelCase(def.name) + ".go", prefixString + content);
         }
+    }
+
+    public function toGoPath(path:String):Array<String> {
+        final paths = path.split(".");
+        final lastPath = paths[paths.length - 1];
+        paths[paths.length - 1] = lastPath.charAt(0).toLowerCase() + lastPath.substr(1);
+        return paths;
     }
 
     private function printFile(s:String) {
