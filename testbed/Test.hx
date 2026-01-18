@@ -1,3 +1,6 @@
+import go.Float64;
+import go.Fmt;
+
 @:go.StructAccess({ name: "bass", imports: ["github.com/wieku/danser-go/framework/bass"] })
 extern class Bass {
     static function init(offscreen: Bool): Void;
@@ -7,8 +10,8 @@ extern class Bass {
 @:go.StructAccess({ name: "*bass.TrackBass", imports: ["github.com/wieku/danser-go/framework/bass"] })
 extern class Track {
     function play(): Void;
-    function getPosition(): Float;
-    function getLength(): Float;
+    function getPosition(): Float64;
+    function getLength(): Float64;
 }
 
 class Test {
@@ -18,14 +21,14 @@ class Test {
 
         var track: Track = Bass.newTrack("/home/mikaib/Music/audio.mp3");
         if (track == null) {
-            Sys.println('failed to load sample!');
+            Sys.println('failed to load track!');
             return;
         }
 
         track.play();
 
         while (true) {
-            go.Fmt.println(track.getPosition(), track.getLength());
+            Fmt.println(track.getPosition(), '/', track.getLength());
         }
     }
 
