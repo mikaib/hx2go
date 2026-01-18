@@ -105,6 +105,7 @@ class Preprocessor {
             case EWhile(cond, body, _):
                 ensureParenthesis(cond);
                 ensureBlock(body);
+                iterateExprPost(e, scope.copy());
 
             // default
             case _: iterateExprPost(e, scope);
