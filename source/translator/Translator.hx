@@ -66,6 +66,11 @@ class Translator {
                     Return.translateReturn(this, e);
                 case EFunction(kind, f):
                     translator.exprs.Function.translateFunction(this, "", f);
+                case EObjectDecl(fields):
+                    translator.exprs.ObjectDecl.translateObjectDecl(this, fields);
+                case EArrayDecl(values):
+                    final ct = HaxeExprTools.stringToComplexType(e.t);
+                    translator.exprs.ArrayDecl.translateArrayDecl(this, values, ct);
                 default:
                     //trace("UNKNOWN EXPR TO TRANSLATE:" + e.def);
                     "_ = 0";
