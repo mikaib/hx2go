@@ -62,6 +62,8 @@ class Translator {
                     Cast.translateCast(this, e, t);
                 case EBreak:
                     Break.translateBreak(this);
+                case EReturn(e):
+                    Return.translateReturn(this, e);
                 case EFunction(kind, f):
                     translator.exprs.Function.translateFunction(this, "", f);
                 default:

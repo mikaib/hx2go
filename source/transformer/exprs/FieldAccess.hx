@@ -74,8 +74,8 @@ function processComplexType(t:Transformer, e2:HaxeExpr, ct:ComplexType):Bool {
     var transformName = false;
 
     for (meta in td.meta()) {
-        if (meta.name == ":go.StaticAccess") {
-            var result = processStaticAccessMeta(t, meta, renamedIdentLeft);
+        if (meta.name == ":go.StructAccess") {
+            var result = processStructAccessMeta(t, meta, renamedIdentLeft);
             renamedIdentLeft = result.name;
             isNative = result.isNative;
             topLevel = result.topLevel;
@@ -90,11 +90,11 @@ function processComplexType(t:Transformer, e2:HaxeExpr, ct:ComplexType):Bool {
     return isNative && !transformName;
 }
 
-function processStaticAccessMeta(t:Transformer, meta:MetadataEntry, defaultName:String):{name:String, isNative:Bool, topLevel:Bool, transformName: Bool} {
+function processStructAccessMeta(t:Transformer, meta:MetadataEntry, defaultName:String):{name:String, isNative:Bool, topLevel:Bool, transformName: Bool} {
     var name = defaultName;
-    var isNative = false;
+    var isNative = true;
     var topLevel = false;
-    var transformName = false;
+    var transformName = true;
 
     var fields = switch meta.params[0].expr {
         case EObjectDecl(fields): fields;
@@ -105,20 +105,16 @@ function processStaticAccessMeta(t:Transformer, meta:MetadataEntry, defaultName:
         switch field.field {
             case "name":
                 name = t.exprToString(field.expr);
-                isNative = true;
 
             case "topLevel" if (t.exprToString(field.expr).trim() == "true"):
                 name = "";
-                isNative = true;
                 topLevel = true;
 
-            case "transformName" if (t.exprToString(field.expr).trim() == "true"):
-                isNative = true;
-                transformName = true;
+            case "transformName" if (t.exprToString(field.expr).trim() == "false"):
+                transformName = false;
 
             case "imports":
                 processImports(t, field.expr);
-                isNative = true;
 
             case _:
         }
