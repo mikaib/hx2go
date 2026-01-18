@@ -8,11 +8,14 @@ import haxe.macro.ComplexTypeTools;
 import haxe.macro.Expr;
 import transformer.exprs.*;
 
+/**
+ * Transforms Haxe AST to Go ready Haxe AST
+ * For example, changes try catch to defer panic pattern
+ */
 @:structInit
 class Transformer {
     public var module:Module = null;
     public var def:HaxeTypeDefinition = null;
-
     public function transformExpr(e:HaxeExpr, ?parent:HaxeExpr, ?parentIdx:Int) {
         if (e == null || e.def == null) {
             return;
@@ -40,11 +43,15 @@ class Transformer {
                 BinopExpr.transformBinop(this, e, op, e1, e2);
             case ECast(_, t):
                 Cast.transformCast(this, e, t);
+            case EFunction(_, f):
+                transformer.exprs.Function.transformFunction(this, f);
+            case EObjectDecl(fields):
+                final ct = HaxeExprTools.stringToComplexType(e.t);
+                e.def = transformer.exprs.ObjectDecl.transformObjectDecl(this, fields, ct);
             default:
                 iterateExpr(e);
         }
     }
-
     public function iterateExpr(e:HaxeExpr) {
         var idx = 0;
         HaxeExprTools.iter(e, (le) -> {
@@ -52,7 +59,6 @@ class Transformer {
             idx++;
         });
     }
-
     public function transformComplexType(ct:ComplexType) {
         if (ct == null) {
             return;
@@ -224,8 +230,9 @@ class Transformer {
                 case FFun({params: params}):
                     switch field.expr.def {
                         case EFunction(kind, f):
+                            // pass on the params
                             f.params = params;
-                            transformer.decls.Function.transformFunction(this, field.name, f);
+                            transformer.exprs.Function.transformFunction(this, f);
                         default:
                     }
                 default:
