@@ -131,7 +131,7 @@ class ExprParser {
                 EField(e, field);
             case TYPEEXPR:
                 EConst(CIdent(object.subType));
-            case FSTATIC:
+            case FSTATIC | FINSTANCE:
                 // [FStatic:(s : String) -> Void]
                 // 			fmt
 				// 			println:(s : String) -> Void
@@ -170,12 +170,9 @@ class ExprParser {
                 // TODO add arg info
                 throw "not allowed to have arg converted to expr";
             case RETURN:
-                EReturn(objectToExpr(object.objects[0]));
+                EReturn(object.objects.length > 0 ? objectToExpr(object.objects[0]) : null);
             case BINOP:
                 EBinop(stringToBinop(object.objects[1].string()), objectToExpr(object.objects[0]), objectToExpr(object.objects[2]));
-            case FINSTANCE:
-                //specialDef = FInstance(object.dataLines[1].split(":")[0]);
-                null;
             case UNOP:
                 // TODO unop, and postFix, not implemented
                 if (object.objects.length != 3) {

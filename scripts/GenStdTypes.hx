@@ -212,7 +212,7 @@ function main() {
     convContent.add('// ------------------------ THIS FILE HAS BEEN GENERATED! ------------------------\n');
     convContent.add('// Please invoke the generator using `./Scripts/GenStdTypes` from the project root\n');
     convContent.add('// ------------------------ THIS FILE HAS BEEN GENERATED! ------------------------\n\n');
-    convContent.add('@:go.StaticAccess({ topLevel: true })\n');
+    convContent.add('@:go.StructAccess({ topLevel: true, transformName: false })\n');
     convContent.add('extern class Go {\n');
 
     for (t in types) {

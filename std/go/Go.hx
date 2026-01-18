@@ -4,7 +4,7 @@ package go;
 // Please invoke the generator using `./Scripts/GenStdTypes` from the project root
 // ------------------------ THIS FILE HAS BEEN GENERATED! ------------------------
 
-@:go.StaticAccess({ topLevel: true })
+@:go.StructAccess({ topLevel: true, transformName: false })
 extern class Go {
    @:pure public static extern function int(x: Any): GoInt;
    @:pure public static extern function uint(x: Any): GoUInt;

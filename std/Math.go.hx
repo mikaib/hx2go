@@ -1,9 +1,7 @@
 import go.Go;
-import go.Syntax;
 import go.math.Rand;
 
 @:pure
-@:go.StaticAccess({ name: "math", imports: ["math"], transformName: true })
 extern class Math {
 
     static var PI(get, null):Float;
@@ -11,28 +9,59 @@ extern class Math {
     static var POSITIVE_INFINITY(get, null):Float;
     static var NaN(get, null):Float;
 
-    static function abs(v:Float):Float;
-    static function min(a:Float, b:Float):Float;
-    static function max(a:Float, b:Float):Float;
-    static function sin(v:Float):Float;
-    static function cos(v:Float):Float;
-    static function tan(v:Float):Float;
-    static function asin(v:Float):Float;
-    static function acos(v:Float):Float;
-    static function atan(v:Float):Float;
-    static function atan2(y:Float, x:Float):Float;
-    static function exp(v:Float):Float;
-    static function log(v:Float):Float;
-    static function pow(v:Float, exp:Float):Float;
-    static function sqrt(v:Float):Float;
-    static function isNaN(f:Float):Bool;
+    inline static function abs(v:Float):Float
+        return go.math.Math.abs(v);
 
-    @:native("Floor")
-    static function ffloor(v:Float):Float;
-    @:native("Ceil")
-    static function fceil(v:Float):Float;
-    @:native("Round")
-    static function fround(v:Float):Float;
+    inline static function min(a:Float, b:Float):Float
+        return go.math.Math.min(a, b);
+
+    inline static function max(a:Float, b:Float):Float
+        return go.math.Math.max(a, b);
+
+    inline static function sin(v:Float):Float
+        return go.math.Math.sin(v);
+
+    inline static function cos(v:Float):Float
+        return go.math.Math.cos(v);
+
+    inline static function tan(v:Float):Float
+        return go.math.Math.tan(v);
+
+    inline static function asin(v:Float):Float
+        return go.math.Math.asin(v);
+
+    inline static function acos(v:Float):Float
+        return go.math.Math.acos(v);
+
+    inline static function atan(v:Float):Float
+        return go.math.Math.atan(v);
+
+    inline static function atan2(y:Float, x:Float):Float
+        return go.math.Math.atan2(y, x);
+
+    inline static function exp(v:Float):Float
+        return go.math.Math.exp(v);
+
+    inline static function log(v:Float):Float
+        return go.math.Math.log(v);
+
+    inline static function pow(v:Float, exp:Float):Float
+        return go.math.Math.pow(v, exp);
+
+    inline static function sqrt(v:Float):Float
+        return go.math.Math.sqrt(v);
+
+    inline static function isNaN(f:Float):Bool
+        return go.math.Math.isNaN(f);
+
+    inline static function ffloor(v:Float):Float
+        return go.math.Math.floor(v);
+
+    inline static function fceil(v:Float):Float
+        return go.math.Math.ceil(v);
+
+    inline static function fround(v:Float):Float
+        return go.math.Math.round(v);
 
     inline static function round(v:Float):Int
         return Go.int(fround(v));
@@ -47,18 +76,18 @@ extern class Math {
         return Rand.float64();
 
     inline static function isFinite(f:Float):Bool
-        return Syntax.code("!math.IsNaN({0}) && !math.IsInf({0}, 0)", f);
+        return !go.math.Math.isNaN(f) && !go.math.Math.isInf(f, 0);
 
     inline static function get_PI():Float
-        return 3.141592653589793;
+        return go.math.Math.Pi;
 
     inline static function get_NEGATIVE_INFINITY():Float
-        return Syntax.code("math.Inf(-1)");
+        return go.math.Math.inf(-1);
 
     inline static function get_POSITIVE_INFINITY():Float
-        return Syntax.code("math.Inf(1)");
+        return go.math.Math.inf(1);
 
     inline static function get_NaN():Float
-        return Syntax.code("math.NaN()");
+        return go.math.Math.NaN();
 
 }
