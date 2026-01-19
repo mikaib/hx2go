@@ -78,11 +78,11 @@ class Module {
         return null;
     }
 
-    public function resolveClass(pack:Array<String>, name:String):HaxeTypeDefinition {
+    public function resolveClass(pack:Array<String>, name:String, forceGlobalResolve: Bool = false):HaxeTypeDefinition {
         // trace(resolveModule);
         // local
-        if (pack.length == 0) {
-            return resolveLocalDef(this, name);
+        if (pack.length == 0 && !forceGlobalResolve) {
+            return resolveLocalDef(this, name) ?? resolveClass(pack, name, true);
         }else{
             final resolveModule = pack.join(".") + (pack.length > 0 ? "." : "") + name;
             // global

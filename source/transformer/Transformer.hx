@@ -151,7 +151,6 @@ class Transformer {
             case "go.GoUInt": "uint";
             case "go.Rune": "rune";
             case "go.Byte": "byte";
-            case "Array": '*struct{ data []${transformComplexTypeParam(p.params, 0)} }';
             case "go.Slice": '[]${transformComplexTypeParam(p.params, 0)}';
             case "go.Pointer": '*${transformComplexTypeParam(p.params, 0)}';
             case "go.Tuple": {
@@ -186,13 +185,15 @@ class Transformer {
             }
             case "Bool": "bool";
             case "Dynamic": "map[string]dynamic";
+            case "Array": '*struct{ data []${transformComplexTypeParam(p.params, 0)} }';
+            case "Null": '${transformComplexTypeParam(p.params, 0)}'; // TODO: implement Null<T>, currently just bypass
             case _:
                 trace("unhandled coreType: " + tdName);
                 "#UNKNOWN_TYPE";
         }
 
         p.params = switch tdName {
-            case "go.Slice" | "go.Nullable" | "go.Pointer": [];
+            case "go.Slice" | "go.Nullable" | "go.Pointer" | "Null": [];
             case _: p.params;
         }
     }

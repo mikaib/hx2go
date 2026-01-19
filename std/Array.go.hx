@@ -33,16 +33,34 @@ import runtime.HxArray;
 
 @:coreType
 extern class Array<T> {
-    var length(default, null):Int;
 
-    function new():Void;
-    function concat(a:Array<T>):Array<T>;
-    function join(sep:String):String;
-    function pop():Null<T>;
-    inline function push(x:T):Int {
+    var length(get, never):Int;
+
+    public inline function get_length():Int {
+        return HxArray.getLength(this);
+    }
+
+    inline function push(x: T):Int {
         return HxArray.push(this, x);
     }
-    function reverse():Void;
+
+    inline function concat(a:Array<T>):Array<T> {
+        return HxArray.concat(this, a);
+    }
+
+    inline function copy():Array<T> {
+        return HxArray.copy(this);
+    }
+
+    inline function pop():Null<T> {
+        return HxArray.pop(this);
+    }
+
+    inline function reverse():Void {
+        HxArray.reverse(this);
+    }
+
+    function join(sep:String):String;
     function shift():Null<T>;
     function slice(pos:Int, ?end:Int):Array<T>;
     function sort(f:T->T->Int):Void;
@@ -54,7 +72,6 @@ extern class Array<T> {
     @:pure function contains( x : T ) : Bool;
     function indexOf(x:T, ?fromIndex:Int):Int;
     function lastIndexOf(x:T, ?fromIndex:Int):Int;
-    function copy():Array<T>;
     @:runtime inline function iterator():haxe.iterators.ArrayIterator<T> {
         return new haxe.iterators.ArrayIterator(this);
     }
@@ -74,4 +91,8 @@ extern class Array<T> {
         return [for (v in this) if (f(v)) v];
     }
     function resize(len:Int):Void;
+
+    // TODO: impl
+    function new(): Void;
+
 }
