@@ -198,19 +198,6 @@ class Semantics {
 	}
 
 	/**
-	 * Converts an expression to a string if possible.
-	 * @param e The expression
-	 */
-	public static function exprToString(e: HaxeExpr):String {
-		return switch e.def {
-			case EConst(CIdent(s)), EConst(CString(s)):
-				s;
-			default:
-				throw "exprToString not implemented: " + e.def;
-		}
-	}
-
-	/**
 	 * Gives some useful information given a function call expression.
 	 * @param e The function call expression
 	 */
