@@ -10,10 +10,10 @@ import go.Go;
 class HxArray {
 
     @:pure public inline extern static function getData<T>(arr: Array<T>): Slice<T>
-        return Syntax.code('{0}.data', arr);
+        return Syntax.code('*{0}', arr);
 
     public inline extern static function setData<T>(arr: Array<T>, data: Slice<T>): Void
-        Syntax.code('{0}.data = {1}', arr, data);
+        Syntax.code('*{0} = {1}', arr, data);
 
     public inline extern static function push<T>(arr: Array<T>, value: T): GoInt {
         var data = getData(arr);
@@ -24,14 +24,14 @@ class HxArray {
 
     @:pure public inline extern static function concat<T>(on: Array<T>, arr: Array<T>): Array<T> {
         var newArr: Array<T> = on.copy();
-        setData(newArr, Syntax.code('append({0}.data, {1}.data...)', newArr, arr));
+        setData(newArr, Syntax.code('append(*{0}, *{1}...)', newArr, arr));
 
         return newArr;
     }
 
     @:pure public inline extern static function copy<T>(arr: Array<T>): Array<T> {
         var newArr: Array<T> = [];
-        setData(newArr, Syntax.code('append({0}.data, {1}.data...)', newArr, arr));
+        setData(newArr, Syntax.code('append(*{0}, *{1}...)', newArr, arr));
 
         return newArr;
     }
@@ -75,7 +75,7 @@ class HxArray {
     }
 
     public inline extern static function unshift<T>(arr: Array<T>, value: T): Void {
-        setData(arr, Syntax.code('append({0}.data, {1}.data...)', ([value] : Array<T>), arr));
+        setData(arr, Syntax.code('append(*{0}, *{1}...)', ([value] : Array<T>), arr));
     }
 
     public inline extern static function insert<T>(arr: Array<T>, pos: Int, value: T): Void {
@@ -126,7 +126,7 @@ class HxArray {
         setData(
             removed,
             Syntax.code(
-                'append({0}.data, {1}.data[{2}:{3}]...)',
+                'append(*{0}, *{1}[{2}:{3}]...)',
                 removed,
                 arr,
                 start,
@@ -137,7 +137,7 @@ class HxArray {
         setData(
             arr,
             Syntax.code(
-                'append({0}.data[:{1}], {0}.data[{2}:]...)',
+                'append(*{0}[:{1}], *{0}[{2}:]...)',
                 arr,
                 start,
                 start + removeLen
@@ -177,7 +177,7 @@ class HxArray {
         setData(
             result,
             Syntax.code(
-                'append({0}.data, {1}.data[{2}:{3}]...)',
+                'append(*{0}, *{1}[{2}:{3}]...)',
                 result,
                 arr,
                 start,
@@ -210,7 +210,7 @@ class HxArray {
         setData(
             arr,
             Syntax.code(
-                'append({0}.data[:{1}], {0}.data[{2}:]...)',
+                'append(*{0}[:{1}], *{0}[{2}:]...)',
                 arr,
                 index,
                 index + 1

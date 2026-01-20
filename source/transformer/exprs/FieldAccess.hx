@@ -201,7 +201,7 @@ function handleCallTransform(t:Transformer, e:HaxeExpr, params:Array<HaxeExpr>, 
 function handleFieldTransform(t:Transformer, e:HaxeExpr, p:TypePath, e2Name:String, field:String):Bool {
     var transformed = switch [p.name, p.pack, p.params, field] {
         case ['Array', [], _, 'length']:
-            e.def = EGoCode('int32(len(${e2Name}.data))', []);
+            e.def = EGoCode('int32(len(*${e2Name}))', []);
             true;
 
         case _:

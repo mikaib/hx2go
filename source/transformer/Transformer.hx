@@ -187,7 +187,7 @@ class Transformer {
             }
             case "Bool": "bool";
             case "Dynamic": "any";
-            case "Array": '*struct{ data []${transformComplexTypeParam(p.params, 0)} }';
+            case "Array": '*[]${transformComplexTypeParam(p.params, 0)}';
             case "Null": '${transformComplexTypeParam(p.params, 0)}'; // TODO: implement Null<T>, currently just bypass
             case _:
                 trace("unhandled coreType: " + tdName);
