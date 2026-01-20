@@ -19,7 +19,7 @@ class HxArray {
         var data = getData(arr);
         setData(arr, Go.append(data, value));
 
-        return data.length;
+        return data.length + 1;
     }
 
     @:pure public inline extern static function concat<T>(on: Array<T>, arr: Array<T>): Array<T> {
