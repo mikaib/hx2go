@@ -11,7 +11,8 @@ class Test {
             Fmt.println(word);
         }
 
-        Fmt.println(arr.copy(), arr.join(", "));
+        Sys.println(arr.copy());
+        Sys.println(arr.join(", "));
     }
 
 }

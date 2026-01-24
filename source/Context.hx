@@ -3,6 +3,8 @@ package;
 import sys.FileSystem;
 import sys.io.File;
 import parser.IParser;
+import haxe.io.Path;
+import translator.TranslatorTools;
 
 @:structInit
 class ContextOptions {
@@ -72,25 +74,61 @@ class Context {
     public function run(): ContextResults {
         _parser.run("");
 
+        var buf = new StringBuf();
+        buf.add("package main\n\n");
+
+        var subBuffer = new StringBuf();
         for (module in _cache.iterator()) {
-            if (module.path == options.entryPoint)
+            if (module.path == options.entryPoint) {
                 module.mainBool = true;
-            module.run();
+            }
+
+            module.run(subBuffer);
         }
-        // get current location
+
+        var imports = [];
+        for (mod in _cache.iterator()) {
+            for (def in mod.defs) {
+                for (imp in def.goImports) {
+                    if (!imports.contains(imp)) imports.push(imp);
+                }
+            }
+        }
+
+        for (imp in imports) {
+            buf.add('import "' + imp + '"\n');
+        }
+
+        if (imports.length > 0) buf.add("\n");
+        buf.add(subBuffer.toString());
+
+        buf.add('func main() {\n');
+        buf.add('\tHx_${modulePathToPrefix(options.entryPoint)}_main()\n');
+        buf.add('}\n');
+
+        final outPath = Path.join([ options.output ]);
+        final dir = Path.directory(outPath);
+
+        if (!FileSystem.exists(dir)) {
+            FileSystem.createDirectory(dir);
+        }
+
         final cwd = Sys.getCwd();
-        // go to output directory
-        Sys.setCwd(options.output);
-        // create go.mod
-        if (!FileSystem.exists("go.mod"))
+        File.saveContent(outPath, buf.toString());
+        Sys.setCwd(dir);
+
+        if (!FileSystem.exists("go.mod")) {
             Sys.command("go mod init hx2go");
+        }
+
         if (options.buildAfterCompilation) {
             Sys.command('go build .');
         }
+
         if (options.runAfterCompilation) {
             Sys.command('go run .');
         }
-        // revert back cwd
+
         Sys.setCwd(cwd);
 
         return null;

@@ -78,12 +78,9 @@ class Translator {
     }
     public function translateDef(def:HaxeTypeDefinition):String {
         var buf = new StringBuf();
-        var impString = "";
-        for (imp in def.goImports)
-            buf.add('import "$imp"\n');
 
         for (field in def.fields) {
-            final name = toPascalCase(field.name);
+            final name = 'Hx_${modulePathToPrefix(def.module)}_${field.name}';
             final expr:HaxeExpr = field.expr;
 
             switch field.kind {

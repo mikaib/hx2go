@@ -73,7 +73,7 @@ class Transformer {
 
                 final td = module.resolveClass(p.pack, p.name);
                 if (td == null) {
-                    handleMissingTypeDefinition(p, ct);
+                    trace('null td for transformComplexType', p);
                     return;
                 }
 
@@ -95,16 +95,6 @@ class Transformer {
                     transformComplexType(t2);
                 default:
             }
-        }
-    }
-
-    function handleMissingTypeDefinition(p:TypePath, ct:ComplexType) {
-        if (p.pack.length == 1) {
-            if (module.canResolveLocalTypeParam(p.pack[0], p.name)) {
-                p.pack = [];
-            }
-        } else {
-            trace('td is null in transformComplexType for' + ct);
         }
     }
 
