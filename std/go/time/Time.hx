@@ -7,7 +7,8 @@ extern class Time {
     static var second: Duration;
 
     static function sleep(d: Duration): Void;
-    static function since(t: Time): Duration;
-    static function now(): Time;
+    @:pure static function since(t: Time): Duration;
+    @:pure static function duration(v: Any): Duration;
+    @:pure static function now(): Time;
 
 }
