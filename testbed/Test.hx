@@ -14,7 +14,7 @@ extern class OS {
 class Test {
 
     public static function main() {
-        var file = switch OS.open("~/Documents/test.txt") {
+        var file: Null<File> = switch OS.open("~/Documents/test.txt") {
             case Success(r): Fmt.println("File opened :-)", r); r;
             case Failure(e): Fmt.println("Failed :'(", e); null;
         }

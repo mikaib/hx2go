@@ -2,6 +2,6 @@ package go;
 
 @:coreType
 enum ResultKind<R, E = Error> {
-    Success(r: R);
-    Failure(e: E);
+    Ok(r: R);
+    Err(e: E);
 }
