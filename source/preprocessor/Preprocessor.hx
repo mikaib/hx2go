@@ -272,6 +272,10 @@ class Preprocessor {
                 result = tmp.ident;
             }
 
+            case ESwitch(e, cases, edef): {
+                throw "ESwitch(...) toExpr not implemented yet";
+            }
+
             case _: trace('cannot transform to expr:', stmt); stmt;
         }
 

@@ -56,6 +56,8 @@ class Transformer {
                 transformer.exprs.ArrayAccess.transformArrayAccess(this, e, e1, e2);
             case ENew(tpath, params):
                 transformer.exprs.New.transformNew(this, e, tpath, params);
+            case ESwitch(on, cases, def):
+                Switch.transformSwitch(this, e, on, cases, def);
             case EGoEnumParameter(e0, kind, idx):
                 transformer.exprs.EnumParameter.transformEnumParameter(this, e, e0, kind, idx);
             default:
@@ -158,7 +160,7 @@ class Transformer {
             case "go.Byte": "byte"; // TODO: must be implemented
             case "go.Slice": '[]${transformComplexTypeParam(p.params, 0)}';
             case "go.Pointer": '*${transformComplexTypeParam(p.params, 0)}';
-            case "go.Result": {
+            case "go.Result", "go.ResultKind": {
                 resultToTuple(p);
                 handleTuple(p);
             }

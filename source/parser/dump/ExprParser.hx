@@ -266,9 +266,9 @@ class ExprParser {
                     }
 
                     {
-                        values: [ objectToExpr(object.objects[0]) ],
+                        values: [ objectToExpr(c.objects[0]) ],
                         guard: emptyExpr(),
-                        expr: object.objects.length > 1 ? objectToExpr(object.objects[1]) : emptyExpr(),
+                        expr: c.objects.length > 1 ? objectToExpr(c.objects[1]) : emptyExpr(),
                     }
                 }), null);
 

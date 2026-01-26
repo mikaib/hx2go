@@ -12,10 +12,8 @@ function transformBinop(t:Transformer, e:HaxeExpr, op:Binop, e1:HaxeExpr, e2:Hax
 
 function exprToInt(e: HaxeExpr): Int {
     return switch e.def {
-        case EConst(CInt(s, _)):
-            Std.parseInt(s);
-        default:
-            0;
+        case EConst(CInt(s, _)): Std.parseInt(s);
+        case _: 0;
     }
 }
 
