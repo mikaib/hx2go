@@ -8,15 +8,8 @@ function transformEnumParameter(t:Transformer, expr: HaxeExpr, on:HaxeExpr, kind
         case _: on;
     }
 
-    final ct = HaxeExprTools.stringToComplexType(on.t); // NOTE: e.t is ResultKind<R, E> with Unknown<n> as params, use inner if we care about types.
-
-    switch ct {
-        case TPath(p):
-            switch [p.pack, p.name] {
-                case [["go"], "ResultKind"]: transformResultAccess(expr, inner, kind);
-                case _: null;
-            }
-
+    switch HaxeExprTools.stringToComplexType(on.t) { // NOTE: e.t is ResultKind<R, E> with Unknown<n> as params, use inner if we care about types.
+        case TPath({ pack: ["go"], name: "ResultKind" }): transformResultAccess(expr, inner, kind);
         case _: null;
     }
 
@@ -24,7 +17,7 @@ function transformEnumParameter(t:Transformer, expr: HaxeExpr, on:HaxeExpr, kind
 }
 
 function transformResultAccess(outer: HaxeExpr, inner:HaxeExpr, kind:String) {
-    switch kind { // we don't care about index as there is only one.
+    switch kind { // we don't care about the parameter index as there is only one.
         case "Ok": outer.def = EField(inner, "Result");
         case "Err": outer.def = EField(inner, "Error");
         case _: trace("unknown ResultKind<R, E> kind!");

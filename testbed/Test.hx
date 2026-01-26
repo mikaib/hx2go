@@ -14,13 +14,20 @@ class Test {
 
     public static function main() {
         final path = "/home/mikaib/Documents/test.txt";
+
+        // using tuple()
+        final tuple = OS.open(path).tuple();
+        Fmt.println("Tuple result:", tuple.error, tuple.result);
+
+        // using switch
         final file = switch OS.open(path) {
             case Ok(r): Fmt.println("File opened :-)", r); r;
             case Err(e): Fmt.println("Failed :'(", e); null;
         }
+        Fmt.println("Switch result:", file);
 
-        Fmt.println("Final result:", file);
-        Fmt.println("Sure() result:", OS.open(path)!);
+        // using sure() or f()!
+        Fmt.println("Sure() result:", OS.open(path).sure());
     }
 
 }

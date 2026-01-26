@@ -3,10 +3,12 @@ package transformer.exprs;
 import haxe.macro.Expr.Binop;
 import haxe.macro.Expr.TypePath;
 import haxe.macro.ComplexTypeTools;
+import haxe.macro.Expr.ComplexType;
 
 function transformBinop(t:Transformer, e:HaxeExpr, op:Binop, e1:HaxeExpr, e2:HaxeExpr) {
     if (handleSideTransform(t, e, op, e1, e2)) return;
     if (handleSideTransform(t, e, op, e2, e1)) return;
+
     t.iterateExpr(e);
 }
 
@@ -24,7 +26,7 @@ function handleSideTransform(t:Transformer, e:HaxeExpr, op:Binop, side:HaxeExpr,
                 return false;
 
             switch HaxeExprTools.stringToComplexType(expr.t) {
-                case TPath(p): handleEnumIndexBinop(t, e, op, expr, otherSide, p);
+                case TPath({ pack: ["go"], name: "Result", params: [_, TPType(errType)] }) if (op == OpEq || op == OpNotEq): handleResultBinop(t, e, op, expr, otherSide, errType);
                 case _: false;
             }
         }
@@ -33,29 +35,19 @@ function handleSideTransform(t:Transformer, e:HaxeExpr, op:Binop, side:HaxeExpr,
     }
 }
 
-function handleEnumIndexBinop(t:Transformer, e:HaxeExpr, op:Binop, side:HaxeExpr, otherSide:HaxeExpr, p: TypePath):Bool {
-    return switch [p.pack, p.name] {
-        case [["go"], "Result"] if (op == OpEq || op == OpNotEq): {
-            final enumIdx = exprToInt(otherSide);
-            final isOk = op == OpEq ? (enumIdx == 0) : (enumIdx != 0);
-            final cmpError = isOk ? OpEq : OpNotEq;
-            final ctError = switch (p.params[1]) {
-                case TPType(ct): ct;
-                case _: trace("undefined error result type"); null;
-            }
+function handleResultBinop(t:Transformer, e:HaxeExpr, op:Binop, side:HaxeExpr, otherSide:HaxeExpr, errType:ComplexType):Bool {
+    final enumIdx = exprToInt(otherSide);
+    final cmpError = (op == OpEq) == (enumIdx == 0) ? OpEq : OpNotEq;
 
-            e.def = EBinop(cmpError, {
-                t: null,
-                def: EField(side, "Error")
-            }, {
-                t: ComplexTypeTools.toString(ctError),
-                def: EConst(CIdent("null"))
-            });
+    e.def = EBinop(cmpError, {
+        t: null,
+        def: EField(side, "Error")
+    }, {
+        t: ComplexTypeTools.toString(errType),
+        def: EConst(CIdent("null"))
+    });
 
-            t.iterateExpr(e);
-            true;
-        }
+    t.iterateExpr(e);
 
-        case _: false;
-    }
+    return true;
 }
