@@ -1,35 +1,44 @@
-import go.Float64;
-import go.Fmt;
+@:go.TypeAccess({ name: "machine", imports: ["machine"] })
+extern class PinMode {}
 
-@:go.StructAccess({ name: "bass", imports: ["github.com/wieku/danser-go/framework/bass"] })
-extern class Bass {
-    static function init(offscreen: Bool): Void;
-    static function newTrack(path: String): Track;
+@:structInit
+@:go.TypeAccess({ name: "machine.PinConfig", imports: ["machine"] })
+extern class PinConfig {
+    var mode: PinMode;
 }
 
-@:go.StructAccess({ name: "*bass.TrackBass", imports: ["github.com/wieku/danser-go/framework/bass"] })
-extern class Track {
-    function play(): Void;
-    function getPosition(): Float64;
-    function getLength(): Float64;
+@:go.TypeAccess({ name: "machine.Pin", imports: ["machine"] })
+extern class Pin {
+    function low(): Void;
+    function high(): Void;
+    function configure(config: PinConfig): Void;
+}
+
+@:go.TypeAccess({ name: "machine", imports: ["machine"] })
+extern class Machine {
+    static var LED: Pin;
+    static var pinOutput: PinMode;
+    static var pinInput: PinMode;
+    static var pinInputPullup: PinMode;
 }
 
 class Test {
 
-    public static function main(): Void {
-        Bass.init(false);
+    public static function main() {
+        var pin = Machine.LED;
+        var conf: PinConfig = {
+            mode: Machine.pinOutput
+        };
 
-        var track: Track = Bass.newTrack("/home/mikaib/Music/audio.mp3");
-        if (track == null) {
-            Sys.println('failed to load track!');
-            return;
-        }
-
-        track.play();
+        pin.configure(conf);
 
         while (true) {
-            Fmt.println(track.getPosition(), '/', track.getLength());
+            pin.high();
+            Sys.sleep(1);
+            pin.low();
+            Sys.sleep(1);
         }
     }
 
 }
+
