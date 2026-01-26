@@ -1,3 +1,4 @@
 package go;
 
-abstract Result<R, E>(ResultKind<R, E>) from ResultKind<R, E> to ResultKind<R, E> {}
+@:go.ProcessedType
+abstract Result<R, E = Error>(ResultKind<R, E>) from ResultKind<R, E> to ResultKind<R, E> {}

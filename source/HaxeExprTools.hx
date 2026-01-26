@@ -92,4 +92,13 @@ class HaxeExprTools {
         }
         return t;
     }
+	public static function typeOfParam(p: TypeParam): ComplexType {
+		return switch (p) {
+			case TPType(t): t;
+			case TPExpr(_): {
+				trace('cannot get type of TPExpr');
+				null;
+			}
+		}
+	}
 }

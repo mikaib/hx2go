@@ -1,5 +1,5 @@
 import go.Result;
-import go.ResultKind;
+import go.ResultKind.*;
 import go.Error;
 import go.Fmt;
 
@@ -15,8 +15,8 @@ class Test {
 
     public static function main() {
         var file = switch OS.open("~/Documents/test.txt") {
-            case Success(r): Fmt.println("File opened:", r); r;
-            case Failure(e): Fmt.println("Failed!!", e); null;
+            case Success(r): Fmt.println("File opened :-)", r); r;
+            case Failure(e): Fmt.println("Failed :'(", e); null;
         }
 
         Fmt.println("Final result:", file);

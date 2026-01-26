@@ -57,6 +57,22 @@ class Preprocessor {
                             return;
                         }
 
+                        trace(p.params[0]);
+                        handleTuple(e, ct, scope);
+
+                    case TPath(p) if (p.name == "Result" && p.pack[0] == "go"):
+                        var info = Semantics.analyzeFunctionCall(this, e);
+                        if (!info.isExtern) {
+                            return;
+                        }
+
+                        p.name = "Tuple";
+                        p.params[0] = TPType(TAnonymous([
+                            { name: "result", pos: p.pos, kind: FVar(HaxeExprTools.typeOfParam(p.params[0])) },
+                            { name: "error", pos: p.pos, kind: FVar(HaxeExprTools.typeOfParam(p.params[1])) }
+                        ]));
+                        p.params.resize(1);
+
                         handleTuple(e, ct, scope);
 
                     case _: null;

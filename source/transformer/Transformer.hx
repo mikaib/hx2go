@@ -110,7 +110,7 @@ class Transformer {
     function processTypeMetadata(p:TypePath, td:HaxeTypeDefinition) {
         for (meta in td.meta()) {
             switch meta.name {
-                case ":coreType":
+                case ":coreType" | ":go.ProcessedType": // coreType doesn't always make sense, :go.ProcessedType exists so you can force processing.
                     processCoreType(p, td.name);
 
                 case ":go.TypeAccess":
@@ -138,36 +138,17 @@ class Transformer {
             case "go.Byte": "byte";
             case "go.Slice": '[]${transformComplexTypeParam(p.params, 0)}';
             case "go.Pointer": '*${transformComplexTypeParam(p.params, 0)}';
-            case "go.Tuple": {
-                var struct: Array<{ name: String, type: String }> = [];
-
-                switch p.params[0] {
-                    case TPType(ct):
-                        switch ct {
-                            case TAnonymous(fields):
-                                for (f in fields) {
-                                    var fct = switch f.kind {
-                                        case FVar(fct): fct;
-                                        case _: null;
-                                    }
-
-                                    transformComplexType(fct);
-
-                                    var ftp = switch (fct) {
-                                        case TPath(tp): tp;
-                                        case _: null;
-                                    }
-
-                                    struct.push({ name: toPascalCase(f.name), type: ftp.name });
-                                }
-
-                            case _: null;
-                        }
-                    case _: null;
-                }
-
-                'struct { ${struct.map(f -> '${f.name} ${f.type}').join('; ')} }';
+            case "go.Result": {
+                p.name = "Tuple";
+                p.params[0] = TPType(TAnonymous([
+                    { name: "result", pos: p.pos, kind: FVar(HaxeExprTools.typeOfParam(p.params[0])) },
+                    { name: "error", pos: p.pos, kind: FVar(HaxeExprTools.typeOfParam(p.params[1])) }
+                ]));
+                p.params.resize(1);
+                handleTuple(p, tdName);
             }
+
+            case "go.Tuple": handleTuple(p, tdName);
             case "Bool": "bool";
             case "Dynamic": "any";
             case "Array": '*[]${transformComplexTypeParam(p.params, 0)}';
@@ -180,6 +161,37 @@ class Transformer {
             case "go.Slice" | "go.Nullable" | "go.Pointer" | "Null" | "Array": [];
             case _: p.params; // ignore coreType
         }
+    }
+
+    function handleTuple(p:TypePath, tdName:String): String {
+        var struct: Array<{ name: String, type: String }> = [];
+
+        switch p.params[0] {
+            case TPType(ct):
+                switch ct {
+                    case TAnonymous(fields):
+                        for (f in fields) {
+                            var fct = switch f.kind {
+                                case FVar(fct): fct;
+                                case _: null;
+                            }
+
+                            transformComplexType(fct);
+
+                            var ftp = switch (fct) {
+                                case TPath(tp): tp;
+                                case _: null;
+                            }
+
+                            struct.push({ name: toPascalCase(f.name), type: ftp.name });
+                        }
+
+                    case _: null;
+                }
+            case _: null;
+        }
+
+        return 'struct { ${struct.map(f -> '${f.name} ${f.type}').join('; ')} }';
     }
 
     function processStructAccess(p:TypePath, meta:MetadataEntry) {
