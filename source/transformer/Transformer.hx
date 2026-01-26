@@ -45,6 +45,8 @@ class Transformer {
                 transformer.decls.ArrayDecl.transformArray(this, e, values);
             case EArray(e1, e2):
                 transformer.exprs.ArrayAccess.transformArrayAccess(this, e, e1, e2);
+            case ENew(tpath, params):
+                transformer.exprs.New.transformNew(this, e, tpath, params);
             default:
                 iterateExpr(e);
         }
@@ -179,14 +181,12 @@ class Transformer {
             case "Array": '*[]${transformComplexTypeParam(p.params, 0)}';
             case "String": "string";
             case "Null": '${transformComplexTypeParam(p.params, 0)}'; // TODO: implement Null<T>, currently just bypass
-            case _:
-                trace("unhandled coreType: " + tdName);
-                "#UNKNOWN_TYPE";
+            case _: p.name; // ignore coreType
         }
 
         p.params = switch tdName {
             case "go.Slice" | "go.Nullable" | "go.Pointer" | "Null" | "Array": [];
-            case _: p.params;
+            case _: p.params; // ignore coreType
         }
     }
 
