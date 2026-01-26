@@ -26,9 +26,11 @@ class Test {
 
     public static function main() {
         var pin = Machine.LED;
-        pin.configure({
+        var conf: PinConfig = {
             mode: Machine.pinOutput
-        });
+        };
+
+        pin.configure(conf);
 
         while (true) {
             pin.high();

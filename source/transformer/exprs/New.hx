@@ -34,7 +34,23 @@ function transformNew(t:Transformer, e:HaxeExpr, tpath: TypePath, params: Array<
     }
 
     if (isNative && structInit) {
-        e.def = EGoCode('${name}{ Mode: {0} }', params); // TODO: impl
+        if (td.constructor == null) {
+            trace('td.constructor may not be null');
+            return;
+        }
+
+        final args = switch td.constructor.expr.def {
+            case EFunction(_, f): f.args;
+            case _: null;
+        };
+
+        if (args == null) {
+            trace('td.constructor args may not be null');
+            return;
+        }
+
+        var count = 0;
+        e.def = EGoCode('${name}{ ${args.map(a -> '${transformName ? toPascalCase(a.name) : a.name}: {${count++}}').join(', ')} }', params);
     }
 
     // TODO: handle normal case
