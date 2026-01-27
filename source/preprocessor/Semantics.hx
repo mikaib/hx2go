@@ -125,6 +125,7 @@ class Semantics {
 			case ECall(_, _): EitherKind;
 			case EFunction(_, _): Expr;
 			case EArrayDecl(_): Expr;
+			case EObjectDecl(_): Expr;
 			case _:
 				trace('unknown kind for:', expr);
 				EitherKind;
