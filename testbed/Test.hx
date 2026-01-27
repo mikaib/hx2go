@@ -1,8 +1,9 @@
 class Test {
-
     public static function main() {
-        Sys.println("Hello, World!");
+        var x = {
+            x: Std.random(10),
+            y: 0.2,
+        };
+        Sys.println(x.x);
     }
-
 }
-
