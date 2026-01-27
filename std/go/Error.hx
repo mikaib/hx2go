@@ -1,4 +1,6 @@
 package go;
 
 @:go.TypeAccess({ name: "error" })
-extern class Error {}
+extern class Error {
+    public function error(): String;
+}
