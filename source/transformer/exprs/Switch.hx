@@ -42,10 +42,12 @@ function handleResultSwitch(t:Transformer, expr: HaxeExpr, on:HaxeExpr, cases: A
         }
     }
 
-    switch (defaultCase) {
-        case _ if (success == null): success = defaultCase;
-        case _ if (failure == null): failure = defaultCase;
-        case _: null; // redundant default case
+    if (success == null) {
+        success = defaultCase;
+    }
+
+    if (failure == null) {
+        failure = defaultCase;
     }
 
     var errType = switch resultType.params[1] {
