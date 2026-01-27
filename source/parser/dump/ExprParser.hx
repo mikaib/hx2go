@@ -259,7 +259,7 @@ class ExprParser {
                 // either way, I don't think it should be a huge deal, but, expect the following code to be incomplete in that regard.
                 // if you are able to get a dump with such cases, please fix this implementation or send me the dump so I can.
                 ESwitch(on, cases.map(c -> {
-                    if (c.objects.length > 1) {
+                    if (c.objects.length > 2) {
                         Util.backtrace("switch case with more than 2 objects", null, null, null, debug_path);
                     }
 
