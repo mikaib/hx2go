@@ -48,7 +48,7 @@ class Module {
             case "String":
                 final module = context.getModule("String");
                 return resolveGlobalDef(module, name);
-            case "Float", "Int", "Single", "Bool":
+            case "Float", "Int", "Single", "Bool", "Dynamic":
                 // StdTypes is module
                 // global
                 final module = context.getModule("StdTypes");

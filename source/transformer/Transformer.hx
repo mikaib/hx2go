@@ -107,6 +107,7 @@ class Transformer {
     function handleCoreTypeName(p:TypePath, tdName:String) {
         p.name = switch tdName {
             case "String": "string";
+            case "Dynamic": "any";
             case "Unknown": "any";
             case _: p.name;
         }
@@ -182,7 +183,7 @@ class Transformer {
                 'struct { ${struct.map(f -> '${f.name} ${f.type}').join('; ')} }';
             }
             case "Bool": "bool";
-            case "Dynamic": "map[string]dynamic";
+            case "Dynamic": "any";
             case _:
                 trace("unhandled coreType: " + tdName);
                 "#UNKNOWN_TYPE";
