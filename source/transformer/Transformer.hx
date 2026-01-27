@@ -195,7 +195,7 @@ class Transformer {
 
                             var ftp = switch (fct) {
                                 case TPath(tp): tp;
-                                case _: null;
+                                case _: trace("ftp in handleTuple (transformer.hx) is null"); null;
                             }
 
                             struct.push({ name: toPascalCase(f.name), type: ftp.name });
