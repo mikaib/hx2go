@@ -182,27 +182,23 @@ class Transformer {
         var struct: Array<{ name: String, type: String }> = [];
 
         switch p.params[0] {
-            case TPType(ct):
-                switch ct {
-                    case TAnonymous(fields):
-                        for (f in fields) {
-                            var fct = switch f.kind {
-                                case FVar(fct): fct;
-                                case _: null;
-                            }
+            case TPType(TAnonymous(fields)):
+                for (f in fields) {
+                    var fct = switch f.kind {
+                        case FVar(fct): fct;
+                        case _: null;
+                    }
 
-                            transformComplexType(fct);
+                    transformComplexType(fct);
 
-                            var ftp = switch (fct) {
-                                case TPath(tp): tp;
-                                case _: trace("ftp in handleTuple (transformer.hx) is null"); null;
-                            }
+                    var ftp = switch (fct) {
+                        case TPath(tp): tp;
+                        case _: trace("ftp in handleTuple (transformer.hx) is null"); null;
+                    }
 
-                            struct.push({ name: toPascalCase(f.name), type: ftp.name });
-                        }
-
-                    case _: null;
+                    struct.push({ name: toPascalCase(f.name), type: ftp.name });
                 }
+
             case _: null;
         }
 
