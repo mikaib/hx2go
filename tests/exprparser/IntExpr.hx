@@ -25,12 +25,11 @@ function run() {
                 case EReturn(e):
                     switch e.def {
                         case EBinop(op, e1, e2):
-                            switch op {
-                                case OpSub:
-                                default:
-                                    assert("SUB", "NOT SUB");
+                            final sub = switch op {
+                                case OpSub: true;
+                                default: false;  
                             }
-                            
+                            assert(sub, true);
                         default:
                             assert("haxeExpr return wrong def type: " + haxeExpr.def, "");
                     }
