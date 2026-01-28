@@ -27,7 +27,9 @@ function run() {
                         case EBinop(op, e1, e2):
                             final sub = switch op {
                                 case OpSub: true;
-                                default: false;  
+                                default:
+                                    trace(op);
+                                    false;  
                             }
                             assert(sub, true);
                         default:
