@@ -12,21 +12,21 @@ haxelib git hxparse https://github.com/Simn/hxparse
 haxelib git haxeparser https://github.com/HaxeCheckstyle/haxeparser
 ```
 
-<img width="1309" height="824" alt="picture of raylib on the Haxe Go target hx2go!" src="https://github.com/user-attachments/assets/d172e3af-2a0c-4c93-aa16-ba89169f8b08" />
-
-
-## Code base layout 
-```haxe
-Main -> new Context().run() -> {
-    _parser.run();
-    for (module in modules)
-        module.run();
-}
-
-// Module.run
-function run() -> 
-preprocessor -> 
-transform -> 
-translator -> 
-sys.io.File.saveContent(definition.name, translatedContentString);
+- Add to your hxml
+```sh
+# sets to run the Go code after
+-D run-go
+-D build-go
+# set the output directory
+--custom-target go=export/output.go
 ```
+
+### Quick testing within hx2go repo
+```sh
+cd hx2go
+haxe testbed.hxml
+```
+Feel free to modify [./testbed/Test.hx](./testbed/Test.hx)
+
+
+### [Also check out the wiki!](https://github.com/go2hx/hx2go/wiki)
