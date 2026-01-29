@@ -33,6 +33,7 @@ class Logging {
     public static var translator: LoggingSource;
     public static var module: LoggingSource;
     public static var context: LoggingSource;
+    public static var trace: LoggingSource;
     public static var testing: LoggingSource;
 
     private static final DIM = "\x1b[2m";
@@ -48,6 +49,11 @@ class Logging {
         Logging.testing = getOrCreateSource("testing");
         Logging.module = getOrCreateSource("module");
         Logging.context = getOrCreateSource("context");
+        Logging.trace = getOrCreateSource("trace");
+
+        haxe.Log.trace = (v: Dynamic, ?posInfos: PosInfos) -> {
+            Logging.context.info(Std.string(v) + posInfos?.customParams?.map(v -> Std.string(v)).join(", ") ?? "", posInfos);
+        };
     }
 
     public static var warningCount: Int = 0;
