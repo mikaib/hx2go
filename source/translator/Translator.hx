@@ -22,7 +22,7 @@ class Translator {
             case TFunction(args, ret):
                 "func(" + args.map(arg -> translateComplexType(arg)).join(", ") + ")" + translateComplexType(ret);
             case TAnonymous(fields):
-                "any"; // TODO: implement
+                "map[string]any";
             default:
                 throw "unknown ct for translateComplexType: " + ct;
         }
@@ -68,10 +68,14 @@ class Translator {
                     Return.translateReturn(this, e);
                 case EFunction(kind, f):
                     translator.exprs.Function.translateFunction(this, "", f);
+                case EObjectDecl(fields):
+                    translator.exprs.ObjectDeclaration.translateObjectDeclaration(this, fields);
                 case EArrayDecl(values, ct):
                     ArrayDeclaration.translateArrayDeclaration(this, e, values, ct);
                 case EArray(e1, e2):
                     translator.exprs.ArrayAccess.translateArrayAccess(this, e1, e2);
+                case EThrow(e):
+                    Throw.translateThrow(this, e);
                 default:
                     //trace("UNKNOWN EXPR TO TRANSLATE:" + e.def);
                     "_ = 0";

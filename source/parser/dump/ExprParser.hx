@@ -43,7 +43,14 @@ class ExprParser {
         return expr;
     }
 
+    private function spacesToTabs(lines:Array<String>) {
+        for (i in 0...lines.length) {
+            lines[i] = StringTools.replace(lines[i], "    ", "\t");
+        }
+    }
+
     public function parseObject(lines:Array<String>):Object {
+        spacesToTabs(lines);
         // invalid expr
         if (lines.length == 0 || StringTools.contains(lines[0], "cf_expr = None;"))
             return null;
@@ -211,7 +218,8 @@ class ExprParser {
                 var e2 = objectToExpr(object.objects[1]);
                 EArray(e1, e2);
             case ARRAYDECL:
-                EArrayDecl(object.objects.map(obj -> objectToExpr(obj)), null);
+                final ct = HaxeExprTools.stringToComplexType(object.defType);
+                EArrayDecl(object.objects.map(obj -> objectToExpr(obj)), ct);
             case NEW:
                 final ct = HaxeExprTools.stringToComplexType(object.objects[0].string());
                 switch ct {
@@ -246,10 +254,33 @@ class ExprParser {
                 EWhile(objectToExpr(object.objects[0]), objectToExpr(object.objects[1]), false);
             case LOCAL:
                 // mikaib: why do we need this?
-                // object.defType = object.subType;
+                // px: because it's required otherwise we get an invalid type
+                // [Local this1(6035):haxe._Rest.NativeRest<haxe.Rest.T>:haxe._Rest.NativeRest<haxe.Rest.T>]
+                object.defType = cutHalfComplexTypeString(object.defType);
+                specialDef = Local;
                 EConst(CIdent(object.subType.substr(0, object.subType.indexOf("("))));
             case PARENTHESIS:
                 EParenthesis(objectToExpr(object.objects[0]));
+            case SWITCH:
+                var cases = object.objects.copy(); // [on, case, case]
+                var on = objectToExpr(cases.shift()); // on, [case, case]
+
+                // mikaib: haxe seems to be very eager on reordering switch cases, so thus far I've been unable to get a dump which defines a guard or more than 1 value per case.
+                // it may only be generated in very specific situations, or perhaps the dump is in a form where that info is lost.
+                // either way, I don't think it should be a huge deal, but, expect the following code to be incomplete in that regard.
+                // if you are able to get a dump with such cases, please fix this implementation or send me the dump so I can.
+                ESwitch(on, cases.map(c -> {
+                    if (c.objects.length > 2) {
+                        Util.backtrace("switch case with more than 2 objects", null, null, null, debug_path);
+                    }
+
+                    {
+                        values: [ objectToExpr(c.objects[0]) ],
+                        guard: emptyExpr(),
+                        expr: c.objects.length > 1 ? objectToExpr(c.objects[1]) : emptyExpr(),
+                    }
+                }), null);
+
             case THROW:
                 EThrow(objectToExpr(object.objects[0]));
             case FOR:
@@ -275,6 +306,10 @@ class ExprParser {
                 }
             case STRING:
                 EConst(CIdent("#STRING " + object.string()));
+            case ENUMINDEX:
+                EGoEnumIndex(objectToExpr(object.objects[0]));
+            case ENUMPARAMETER:
+                EGoEnumParameter(objectToExpr(object.objects[0]), object.objects[1].string(), Std.parseInt(object.objects[2].string()));
             case CAST:
                 ECast(objectToExpr(object.objects[0]), HaxeExprTools.stringToComplexType(object.defType));
             case FUNCTION:
@@ -288,44 +323,18 @@ class ExprParser {
                         type: HaxeExprTools.stringToComplexType(object.objects[0].defType),
                     });
                 }
-
-                var ret = null;
-                if (object.defType != null) {
-                    var depth = 0;
-                    var str = "";
-                    var capture = false;
-                    var last = -1;
-
-                    for (char in object.defType) {
-                        switch char {
-                            case "(".code:
-                                depth++;
-
-                            case ")".code:
-                                depth--;
-
-                            case ">".code if (last == "-".code && depth == 0):
-                                capture = true;
-
-                            case _ if (capture):
-                                str += String.fromCharCode(char);
-
-                            case _: null;
-                        }
-
-                        last = char;
-                    }
-
-                    var trimmed = str.trim();
-                    if (trimmed != "Void") {
-                        ret = HaxeExprTools.stringToComplexType(trimmed);
-                    }
+                final ct = HaxeExprTools.stringToComplexType(object.defType);
+                final ret = switch ct {
+                    case TFunction(_, ret2):
+                        ret2;
+                    default:
+                        trace(ct);
+                        throw "ComplexType of type FUNCTION is not TFunction";
                 }
-
                 EFunction(null, {
                     args: args,
                     expr: objectToExpr(object.objects[object.objects.length - 1]),
-                    ret: ret
+                    ret: ret,
                 });
                 //objectToExpr(object.objects[object.objects.length - 1]).def;
             default:
@@ -340,6 +349,21 @@ class ExprParser {
             remapTo: null,
             special: specialDef
         };
+    }
+    // { y : Float, x : Int }:{ y : Float, x : Int }
+    // into
+    // { y : Float, x : Int }
+    function cutHalfComplexTypeString(s:String):String {
+        var indexes:Array<Int> = [];
+        colonIndexes(s, 0, indexes);
+        return s.substr(0, indexes[Std.int(indexes.length/2)]);
+    }
+    function colonIndexes(s:String, startingIndex:Int, list:Array<Int>) {
+        final index = s.indexOf(":", startingIndex);
+        if (index == -1)
+            return;
+        list.push(index);
+        colonIndexes(s, index + 1, list);
     }
     function emptyExpr():HaxeExpr {
         return {
@@ -508,12 +532,12 @@ class ExprParser {
 
         var defString = str.substring(0, colIdx);
         var remaining = str.substring(colIdx + 1);
-
-        var lastColIdx = findColon(remaining);
-        while (lastColIdx != -1) {
-            remaining = remaining.substring(lastColIdx + 1);
-            lastColIdx = findColon(remaining);
-        }
+        // px: I don't think this is required and was causing problems with some of the dump exprParser tests
+        // var lastColIdx = findColon(remaining);
+        // while (lastColIdx != -1) {
+        //     remaining = remaining.substring(lastColIdx + 1);
+        //     lastColIdx = findColon(remaining);
+        // }
 
         final defTypeString = remaining;
 
