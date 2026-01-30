@@ -1,17 +1,11 @@
-import go.tinygo.Machine;
-
 class Test {
 
     public static function main() {
-        var pin = Machine.LED;
-        pin.configure({ mode: Machine.pinOutput });
-
-        while (true) {
-            pin.high();
-            Sys.sleep(1);
-            pin.low();
-            Sys.sleep(1);
-        }
+        var t = {i: 12, f: 12.1}; // this & lines below required to stop Haxe optimising away the test!
+        Sys.println(t);
+        var i:go.GoInt = go.Syntax.code("{0}.(int)", t.i);
+        var f:Float = go.Syntax.code("{0}.(float64)", t.f);
+        Sys.println(i == f);
     }
 
 }
