@@ -41,8 +41,15 @@ class Preprocessor {
             // defaults
             case EBinop(OpAssign | OpAssignOp(_), _, _): iterateExprPost(e, scope);
 
-            // ensure semantics
-            case EBinop(_, e0, e1): Semantics.ensure(e, [e0, e1], this, scope);
+            // ensure shift + semantics
+            case EBinop(op, e0, e1): {
+                if (op == OpUShr) ensureShift(e, e0, e1, op, false);
+                if (op == OpShr || op == OpShl) ensureShift(e, e0, e1, op, true);
+
+                Semantics.ensure(e, [e0, e1], this, scope);
+            }
+
+            // ensure tuple/result + semantics
             case ECall(_, params): {
                 Semantics.ensure(e, params, this, scope);
 
@@ -474,6 +481,46 @@ class Preprocessor {
         ], cexpr, scope);
 
         cexpr.def = EConst(CIdent('_tuple_' + tmpId));
+    }
+
+    public function getIntegerSigned(t: String): Bool {
+        return switch t {
+            case "Int", "go.GoInt", "go.Int8", "go.Int16", "go.Int32", "go.Int64": true;
+            case "UInt", "go.GoUInt", "go.UInt8", "go.UInt16", "go.UInt32", "go.UInt64": false;
+            case _: true;
+        }
+    }
+
+    public function getIntegerWidth(t: String): Int {
+        return switch t {
+            case "Int", "UInt", "go.GoInt", "go.GoUInt": 32;
+            case "go.Int8", "go.UInt8": 8;
+            case "go.Int16", "go.UInt16": 16;
+            case "go.Int32", "go.UInt32": 32;
+            case "go.Int64", "go.UInt64": 64;
+            case "Float": 64;
+            case _: 32;
+        }
+    }
+
+    public function ensureShift(expr: HaxeExpr, e0: HaxeExpr, e1: HaxeExpr, op: Binop, signed: Bool): Void {
+        if (getIntegerSigned(e0.t) != signed) {
+            final width = getIntegerWidth(e0.t);
+
+            final st_new = 'go.${signed ? "" : "U"}Int$width';
+            final st_old = e0.t;
+
+            final ct_new = HaxeExprTools.stringToComplexType(st_new);
+            final ct_old = HaxeExprTools.stringToComplexType(st_old);
+
+            expr.def = ECast({
+                t: st_new,
+                def: EBinop(op, {
+                    t: st_new,
+                    def: ECast(e0.copy(), ct_new)
+                }, e1)
+            }, ct_old);
+        }
     }
 
 }
