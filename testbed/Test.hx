@@ -1,7 +1,9 @@
+@:analyzer(ignore)
 class Test {
 
     public static function main() {
-        Sys.println("Hello World!");
+        var v = (64 : go.GoInt);
+        Sys.println(~v);
     }
 
 }

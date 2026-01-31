@@ -16,18 +16,10 @@ import HaxeExpr;
     - `~e` (`op = OpNegBits, postFix = false`)
 **/
 function translateUnop(t:Translator, unop:Unop, postFix:Bool, e:HaxeExpr) {
-    return postFix ?
-        (t.translateExpr(e) + printUnop(unop)) : // TODO: OpIncrement and OpDecrement are statements and not expressions in go, see example below.
-        (printUnop(unop) + t.translateExpr(e)); // TODO: not a thing in go
-
-        /*
-            ALLOWED:
-            x++
-            return x;
-
-            NOT ALLOWED:
-            return x++;
-        */
+    return switch postFix {
+        case true: t.translateExpr(e) + printUnop(unop);
+        case false: printUnop(unop) + t.translateExpr(e);
+	}
 }
 
 private function printUnop(op:Unop) {
@@ -36,7 +28,7 @@ private function printUnop(op:Unop) {
     	case OpDecrement: '--';
     	case OpNot: "!";
     	case OpNeg: "-";
-    	case OpNegBits: "~";
+    	case OpNegBits: "^";
     	case OpSpread: "...";
     }
 }
