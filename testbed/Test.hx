@@ -1,3 +1,5 @@
+import go.Go;
+@:analyzer(ignore)
 class Test {
 
     public static function main() {

@@ -157,6 +157,11 @@ class Semantics {
 			case EIf(econd, eif, eelse): hasSideEffects(ctx, econd) || hasSideEffects(ctx, eif) || (eelse != null && hasSideEffects(ctx, eelse));
 			case EWhile(econd, ebody, _): hasSideEffects(ctx, econd) || hasSideEffects(ctx, ebody);
 			case EConst(_): false;
+			case EObjectDecl(fields):
+				for (field in fields)
+					if (hasSideEffects(ctx, field.expr))
+						return true;
+				false;
 			case _:
 				Logging.preprocessor.warn('unknown if expr has side effects (safely assuming it does), for: $expr');
 				true;
