@@ -131,7 +131,7 @@ class Preprocessor {
                     t: null,
                     def: EIf(
                         {
-                            t: null,
+                            t: cond.t,
                             def: EUnop(OpNot, false, cond.copy())
                         },
                         {
@@ -214,9 +214,9 @@ class Preprocessor {
                 var act: HaxeExpr = {
                     t: null,
                     def: EBinop(OpAssign, e, {
-                        t: null,
+                        t: 'Int',
                         def: EBinop(op == OpIncrement ? OpAdd : OpSub, e, {
-                            t: null,
+                            t: 'Int',
                             def: EConst(CInt('1'))
                         })
                     })
@@ -236,7 +236,7 @@ class Preprocessor {
                 var act: HaxeExpr = {
                     t: null,
                     def: EBinop(OpAssign, e1, {
-                        t: null,
+                        t: stmt.t,
                         def: EBinop(op, e1, e2)
                     })
                 };
@@ -308,7 +308,7 @@ class Preprocessor {
 
     public function toStmt(expr: HaxeExpr, scope: Scope): HaxeExpr {
         var inner: HaxeExpr = expr.copy();
-        var outer: HaxeExpr = { t: null, def: EBinop(Binop.OpAssign, { t: null, def: EConst(CIdent("_")) }, inner) };
+        var outer: HaxeExpr = { t: expr.t, def: EBinop(Binop.OpAssign, { t: expr.t, def: EConst(CIdent("_")) }, inner) };
         inner.parent = expr;
         inner.parentIdx = 0;
 
@@ -483,34 +483,15 @@ class Preprocessor {
         cexpr.def = EConst(CIdent('_tuple_' + tmpId));
     }
 
-    public function getIntegerSigned(t: String): Bool {
-        return switch t {
-            case "Int", "go.GoInt", "go.Int8", "go.Int16", "go.Int32", "go.Int64": true;
-            case "UInt", "go.GoUInt", "go.UInt8", "go.UInt16", "go.UInt32", "go.UInt64": false;
-            case _: Logging.preprocessor.error('unrecognised integer type: $t'); true; // abstract should not cause this code path anyway.
-        }
-    }
-
-    public function getIntegerWidth(t: String): Int {
-        return switch t {
-            case "Int", "UInt", "go.GoInt", "go.GoUInt": 32;
-            case "go.Int8", "go.UInt8": 8;
-            case "go.Int16", "go.UInt16": 16;
-            case "go.Int32", "go.UInt32": 32;
-            case "go.Int64", "go.UInt64": 64;
-            case _: Logging.preprocessor.error('unrecognised integer type: $t'); 64; // abstract should not cause this code path anyway.
-        }
-    }
-
     public function ensureShift(expr: HaxeExpr, e0: HaxeExpr, e1: HaxeExpr, op: Binop, scope: Scope, signed: Bool): Void {
-        if (getIntegerSigned(e0.t) != signed) {
-            final width = getIntegerWidth(e0.t);
+        final st_old = e0.t;
+        final ct_old = HaxeExprTools.stringToComplexType(st_old);
+
+        if (Semantics.getIntegerSigned(ct_old) != signed) {
+            final width = Semantics.getIntegerWidth(ct_old);
 
             final st_new = 'go.${signed ? "" : "U"}Int$width';
-            final st_old = e0.t;
-
             final ct_new = HaxeExprTools.stringToComplexType(st_new);
-            final ct_old = HaxeExprTools.stringToComplexType(st_old);
 
             var left = switch e0.def {
                 case EConst(CIdent(s)): e0.copy();

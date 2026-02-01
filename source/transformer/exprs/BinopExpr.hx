@@ -4,10 +4,17 @@ import haxe.macro.Expr.Binop;
 import haxe.macro.Expr.TypePath;
 import haxe.macro.ComplexTypeTools;
 import haxe.macro.Expr.ComplexType;
+import preprocessor.Preprocessor;
+import haxe.EnumTools.EnumValueTools;
+import preprocessor.Semantics;
 
 function transformBinop(t:Transformer, e:HaxeExpr, op:Binop, e1:HaxeExpr, e2:HaxeExpr) {
     if (handleSideTransform(t, e, op, e1, e2)) return;
     if (handleSideTransform(t, e, op, e2, e1)) return;
+
+    if (e1.t != e2.t && op != OpAssign) {
+        promoteBinop(e1, e2, e, op);
+    }
 
     t.iterateExpr(e);
 }
@@ -50,5 +57,37 @@ function handleResultBinop(t:Transformer, e:HaxeExpr, op:Binop, side:HaxeExpr, o
     t.iterateExpr(e);
 
     return true;
+}
+
+function unpackNull(ct: ComplexType) { // avoid usage of this if you can...
+    if (ct == null) {
+        return null;
+    }
+
+    return switch ct {
+        case TPath({ pack: [], name: "Null", params: [TPType(inner)] }): inner;
+        case _: ct;
+    }
+}
+
+function promoteBinop(e1:HaxeExpr, e2:HaxeExpr, e:HaxeExpr, op: Binop) {
+    if (e.t == null) {
+        Logging.transformer.warn("unknown return type of binop");
+        return;
+    }
+
+    final resultCt = HaxeExprTools.stringToComplexType(e.t);
+    final leftCt = unpackNull(e1.t != null ? HaxeExprTools.stringToComplexType(e1.t) : null);
+    final rightCt = unpackNull(e2.t != null ? HaxeExprTools.stringToComplexType(e2.t) : null);
+
+    switch resultCt {
+        case TPath({ pack: [], name: "Bool" }): { // compare
+            // TODO: impl
+        }
+
+        case _: { // generic
+            // TODO: impl
+        }
+    }
 }
 

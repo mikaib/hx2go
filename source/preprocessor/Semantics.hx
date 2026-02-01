@@ -2,6 +2,7 @@ package preprocessor;
 
 import HaxeExpr;
 import transformer.Transformer;
+import haxe.macro.Expr.ComplexType;
 
 enum ExprKind {
 	Stmt;
@@ -260,6 +261,120 @@ class Semantics {
 				}
 
 			case _: { isExtern: false, isPure: false, failed: true };
+		}
+	}
+
+	/**
+	 * Given an integer type, will return if it's signed or not.
+	 * @param t The type to check
+	 */
+	public static function getIntegerSigned(t: ComplexType): Bool {
+		return switch t {
+			case TPath({ pack: [], name: "Int" }): true;
+			case TPath({ pack: ["go"], name: "GoInt" }): true;
+			case TPath({ pack: ["go"], name: "Int8" }): true;
+			case TPath({ pack: ["go"], name: "Int16" }): true;
+			case TPath({ pack: ["go"], name: "Int32" }): true;
+			case TPath({ pack: ["go"], name: "Int64" }): true;
+
+			case TPath({ pack: [], name: "UInt" }): false;
+			case TPath({ pack: ["go"], name: "GoUInt" }): false;
+			case TPath({ pack: ["go"], name: "UInt8" }): false;
+			case TPath({ pack: ["go"], name: "UInt16" }): false;
+			case TPath({ pack: ["go"], name: "UInt32" }): false;
+			case TPath({ pack: ["go"], name: "UInt64" }): false;
+			case TPath({ pack: ["go"], name: "Rune" }): false;
+			case TPath({ pack: ["go"], name: "Byte" }): false;
+
+			case _: Logging.preprocessor.error('unrecognised integer type: $t'); true; // abstract should not cause this code path anyway.
+		}
+	}
+
+	/**
+	 * Given an integer type, will return it's width in bits.
+	 * @param t The type to check
+	 */
+	public static function getIntegerWidth(t: ComplexType): Int {
+		return switch t {
+			case TPath({ pack: [], name: "Int" }): 32;
+			case TPath({ pack: [], name: "UInt" }): 32;
+			case TPath({ pack: ["go"], name: "GoInt" }): 32;
+			case TPath({ pack: ["go"], name: "GoUInt" }): 32;
+
+			case TPath({ pack: ["go"], name: "Int8" }): 8;
+			case TPath({ pack: ["go"], name: "UInt8" }): 8;
+			case TPath({ pack: ["go"], name: "Rune" }): 8;
+			case TPath({ pack: ["go"], name: "Byte" }): 8;
+
+			case TPath({ pack: ["go"], name: "Int16" }): 16;
+			case TPath({ pack: ["go"], name: "UInt16" }): 16;
+
+			case TPath({ pack: ["go"], name: "Int32" }): 32;
+			case TPath({ pack: ["go"], name: "UInt32" }): 32;
+
+			case TPath({ pack: ["go"], name: "Int64" }): 64;
+			case TPath({ pack: ["go"], name: "UInt64" }): 64;
+
+			case _: Logging.preprocessor.error('unrecognised integer type: $t'); 64; // abstract should not cause this code path anyway.
+		}
+	}
+
+	/**
+	 * Checks if the given type is a Float type (or should be treated as one).
+	 * @param t The type to check
+	 */
+	public static function isFloatType(t: ComplexType): Bool {
+		return switch t {
+			case TPath({ pack: [], name: "Float" }): true;
+			case TPath({ pack: ["go"], name: "Float32" }): true;
+			case TPath({ pack: ["go"], name: "Float64" }): true;
+			case _: false;
+		}
+	}
+
+	/**
+	 * Checks if the given type is a Boolean type (or should be treated as one).
+	 * @param t The type to check
+	 */
+	public static function isBoolType(t: ComplexType): Bool {
+		return switch t {
+			case TPath({ pack: [], name: "Bool" }): true;
+			case _: false;
+		}
+	}
+
+	/**
+	 * Checks if the given type is an Integer type (or should be treated as one).
+	 * @param t The type to check
+	 */
+	public static function isIntegerType(t: ComplexType): Bool {
+		return switch t {
+			case TPath({ pack: [], name: "Int" }): true;
+			case TPath({ pack: [], name: "UInt" }): true;
+			case TPath({ pack: ["go"], name: "GoInt" }): true;
+			case TPath({ pack: ["go"], name: "GoUInt" }): true;
+			case TPath({ pack: ["go"], name: "Int8" }): true;
+			case TPath({ pack: ["go"], name: "UInt8" }): true;
+			case TPath({ pack: ["go"], name: "Int16" }): true;
+			case TPath({ pack: ["go"], name: "UInt16" }): true;
+			case TPath({ pack: ["go"], name: "Int32" }): true;
+			case TPath({ pack: ["go"], name: "UInt32" }): true;
+			case TPath({ pack: ["go"], name: "Int64" }): true;
+			case TPath({ pack: ["go"], name: "UInt64" }): true;
+			case TPath({ pack: ["go"], name: "Rune" }): true;
+			case TPath({ pack: ["go"], name: "Byte" }): true;
+			case _: false;
+		}
+	}
+
+	/**
+	 * Checks if the given type is a String type (or should be treated as one).
+	 * @param t The type to check
+	 */
+	public static function isStringType(t: ComplexType): Bool {
+		return switch t {
+			case TPath({ pack: [], name: "String" }): true;
+			case _: false;
 		}
 	}
 
