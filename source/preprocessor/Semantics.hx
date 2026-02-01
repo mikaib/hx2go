@@ -297,9 +297,9 @@ class Semantics {
 	public static function getIntegerWidth(t: ComplexType): Int {
 		return switch t {
 			case TPath({ pack: [], name: "Int" }): 64;
-			case TPath({ pack: [], name: "UInt" }): 32;
-			case TPath({ pack: ["go"], name: "GoInt" }): 32;
-			case TPath({ pack: ["go"], name: "GoUInt" }): 32;
+			case TPath({ pack: [], name: "UInt" }): 64;
+			case TPath({ pack: ["go"], name: "GoInt" }): 64; // assuming the wider type here...
+			case TPath({ pack: ["go"], name: "GoUInt" }): 64;
 
 			case TPath({ pack: ["go"], name: "Int8" }): 8;
 			case TPath({ pack: ["go"], name: "UInt8" }): 8;

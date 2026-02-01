@@ -12,6 +12,10 @@ class Test {
 
         Sys.println(i == f);
         Sys.println(i32 == u32);
+
+        var aI: Int = -1;
+        var bI: Int = 1;
+        Sys.println((aI >>> bI : Int));
     }
 
 }
