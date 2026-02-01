@@ -80,13 +80,40 @@ function promoteBinop(e1:HaxeExpr, e2:HaxeExpr, e:HaxeExpr, op: Binop) {
     final leftCt = unpackNull(e1.t != null ? HaxeExprTools.stringToComplexType(e1.t) : null);
     final rightCt = unpackNull(e2.t != null ? HaxeExprTools.stringToComplexType(e2.t) : null);
 
+    final typeEq = (a: ComplexType, b: ComplexType) -> {
+        if (a == null || b == null) {
+            return false;
+        }
+
+        return ComplexTypeTools.toString(a) == ComplexTypeTools.toString(b);
+    }
+
     switch resultCt {
         case TPath({ pack: [], name: "Bool" }): { // compare
-            // TODO: impl
+            // all go.* types are already handled, so we only need to care about basic types
+            switch [leftCt, rightCt] {
+                case [TPath({ pack: [], name: "Int" }), TPath({ pack: [], name: "Float" })]:
+                    e1.def = ECast(e1.copy(), rightCt);
+                    e1.t = e2.t; // this will copy over the Null<T> property if it exists, but that doesn't matter
+
+                case [TPath({ pack: [], name: "Float" }), TPath({ pack: [], name: "Int" })]:
+                    e2.def = ECast(e2.copy(), leftCt);
+                    e2.t = e1.t; // this will copy over the Null<T> property if it exists, but that doesn't matter
+
+                case _: // any other comparison we ignore for now...
+            }
         }
 
         case _: { // generic
-            // TODO: impl
+            if (!typeEq(resultCt, leftCt)) {
+                e1.def = ECast(e1.copy(), resultCt);
+                e1.t = e.t; // this will copy over the Null<T> property if it exists, but that doesn't matter
+            }
+
+            if (!typeEq(resultCt, rightCt)) {
+                e2.def = ECast(e2.copy(), resultCt);
+                e2.t = e.t; // this will copy over the Null<T> property if it exists, but that doesn't matter
+            }
         }
     }
 }
