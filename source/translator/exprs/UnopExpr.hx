@@ -16,7 +16,7 @@ import HaxeExpr;
     - `~e` (`op = OpNegBits, postFix = false`)
 **/
 function translateUnop(t:Translator, unop:Unop, postFix:Bool, e:HaxeExpr) {
-    return if (true) t.translateExpr(e) + printUnop(unop)
+    return if (postFix == true) t.translateExpr(e) + printUnop(unop)
 	else printUnop(unop) + t.translateExpr(e);
 }
 
