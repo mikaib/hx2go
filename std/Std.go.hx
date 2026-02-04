@@ -20,16 +20,11 @@ extern class Std {
 	inline static function int(x:Float):Int
 		return Go.int(x);
 
-	inline static function parseInt(x:String):Null<Int> {
-		// Workaround because a direct return does weird formatting
-		var result = StrConv.parseInt(x, 10, 0);
-		return result.tuple().result;
-	}
+	inline static function parseInt(x:String):Null<Int>
+		return StrConv.parseInt(x, 10, 0).tuple().result;
 
-	inline static function parseFloat(x:String):Float {
-		var result = StrConv.parseFloat(x, 64);
-		return result.tuple().result;
-	}
+	inline static function parseFloat(x:String):Float
+		return StrConv.parseFloat(x, 64).tuple().result;
 
 	inline static function random(x:Int):Int {
 		return Rand.intn(x);
