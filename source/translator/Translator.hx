@@ -76,6 +76,8 @@ class Translator {
                     translator.exprs.ArrayAccess.translateArrayAccess(this, e1, e2);
                 case EThrow(e):
                     Throw.translateThrow(this, e);
+                case EContinue:
+                    Continue.translateContinue(this);
                 default:
                     //trace("UNKNOWN EXPR TO TRANSLATE:" + e.def);
                     "_ = 0";
