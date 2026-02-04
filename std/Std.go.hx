@@ -22,13 +22,13 @@ extern class Std {
 
 	inline static function parseInt(x:String):Null<Int> {
 		// Workaround because a direct return does weird formatting
-		var result = StrConv.ParseInt(x, 10, 0);
-		return result.i;
+		var result = StrConv.parseInt(x, 10, 0);
+		return result.tuple().result;
 	}
 
 	inline static function parseFloat(x:String):Float {
-		var result = StrConv.ParseFloat(x, 64);
-		return result.f;
+		var result = StrConv.parseFloat(x, 64);
+		return result.tuple().result;
 	}
 
 	inline static function random(x:Int):Int {
