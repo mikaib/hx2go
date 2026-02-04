@@ -67,7 +67,7 @@ class Translator {
                 case EReturn(e):
                     Return.translateReturn(this, e);
                 case EFunction(kind, f):
-                    translator.exprs.Function.translateFunction(this, "", f);
+                    translator.exprs.Function.translateFunction(this, "", f, null, true);
                 case EObjectDecl(fields):
                     translator.exprs.ObjectDeclaration.translateObjectDeclaration(this, fields);
                 case EArrayDecl(values, ct):
@@ -85,15 +85,25 @@ class Translator {
     public function translateDef(def:HaxeTypeDefinition):String {
         var buf = new StringBuf();
 
+        if (!def.isExtern) {
+            switch (def.kind) {
+                case TDClass:
+                    buf.add(translateClassDef(this, def)); // TODO: support interfaces
+
+                case _:
+                    // ignore
+            }
+        }
+
         for (field in def.fields) {
-            final name = 'Hx_${modulePathToPrefix(def.name)}_${toPascalCase(field.name)}';
+            final name = field.isStatic ? 'Hx_${modulePathToPrefix(def.name)}_${toPascalCase(field.name)}' : toPascalCase(field.name);
             final expr:HaxeExpr = field.expr;
 
             switch field.kind {
                 case FFun(_):
                     switch expr.def {
                         case EFunction(kind, f):
-                            buf.add(translator.exprs.Function.translateFunction(this, name, f));
+                            buf.add(translator.exprs.Function.translateFunction(this, name, f, def, field.isStatic) + "\n");
                         default:
                             Logging.translator.error('expr.def failure field:' + field.name);
                             throw "expr.def is not EFunction: " + expr.def;
@@ -111,6 +121,70 @@ class Translator {
                 default:
             }
         }
+        return buf.toString();
+    }
+
+    public function translateClassDef(t: Translator, def: HaxeTypeDefinition): String {
+        var buf = new StringBuf();
+        final className = 'Hx_${modulePathToPrefix(def.name)}';
+
+        buf.add('type ${className}_VTable interface {\n');
+
+        for (field in def.fields) {
+            switch field.kind {
+                case FFun(_) if (!field.isStatic):
+                    final methodName = toPascalCase(field.name);
+                    final expr:HaxeExpr = field.expr;
+
+                    buf.add('\t$methodName(');
+
+                    switch expr.def {
+                        case EFunction(kind, f): {
+                            var first = true;
+                            for (arg in f.args) {
+                                if (!first) {
+                                    buf.add(', ');
+                                }
+                                first = false;
+                                buf.add(arg.name + ' ' + t.translateComplexType(arg.type));
+                            }
+                            buf.add(') ');
+
+                            final returnType = t.translateComplexType(f.ret);
+                            if (returnType != "Void") {
+                                buf.add(returnType);
+                            }
+                        }
+
+                        case _: {
+                            Logging.translator.error('expr.def failure field:' + field.name);
+                            throw "expr.def is not EFunction: " + expr.def;
+                        }
+                    }
+
+                    buf.add('\n');
+
+                case _:
+            }
+        }
+
+        buf.add('}\n\n');
+
+        buf.add('type $className struct {\n');
+        buf.add('\tVtable ${className}_VTable\n'); // TODO: add superClass to struct
+
+        if (def.superClass != null) {
+            buf.add('\tSuper *Hx_${modulePathToPrefix(def.superClass)}\n');
+        }
+
+        buf.add('}\n\n');
+
+        buf.add('func ${className}_New() *$className {\n');
+        buf.add('\tobj := &$className{}\n');
+        buf.add('\tobj.Vtable = obj\n'); // TODO: also set vtable on the entire hierarchy of super classes
+        buf.add('\treturn obj\n');
+        buf.add('}\n\n');
+
         return buf.toString();
     }
 }
