@@ -210,7 +210,7 @@ function handleCallTransform(t:Transformer, e:HaxeExpr, params:Array<HaxeExpr>, 
     }
 
     if (transformed) {
-        t.iterateExpr(e.parent);
+        t.iterateExpr(e); // mikaib: e.parent or e?
     }
 
     return transformed;
@@ -233,7 +233,7 @@ function handleFieldTransform(t:Transformer, e:HaxeExpr, ct:ComplexType, e2:Haxe
     }
 
     if (transformed) {
-        t.iterateExpr(e.parent);
+        t.iterateExpr(e); // mikaib: e.parent or e?
     }
 
     return transformed;

@@ -1,11 +1,12 @@
 package;
 
 import preprocessor.Scope;
-import haxe.runtime.Copy;
 import haxe.macro.Expr;
+import haxe.CallStack.StackItem;
 
 enum abstract HaxeExprFlags(Int) from Int to Int {
     public var Processed = 1;
+	public var Transformed = 2;
 }
 
 @:structInit
@@ -18,6 +19,7 @@ class HaxeExpr {
 	public var special:SpecialExprDef = null;
 	public var def:HaxeExprDef;
 	public var t:String;
+	// public var stck: Array<Array<StackItem>> = [];
 
 	public function copy(deep: Bool = false): HaxeExpr {
 	    return {

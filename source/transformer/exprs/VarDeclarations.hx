@@ -4,9 +4,17 @@ import haxe.macro.ComplexTypeTools;
 import HaxeExpr.HaxeVar;
 
 function transformVarDeclarations(t:Transformer, e:HaxeExpr, vars:Array<HaxeVar>) {
-    trace(e, e.t);
-
     for (i in 0...vars.length) {
+        if (vars[i].type != null && vars[i].expr?.t != null) {
+            final varType = ComplexTypeTools.toString(vars[i].type);
+            final exprType = vars[i].expr.t;
+
+            if (varType != exprType) {
+                vars[i].expr.def = ECast(vars[i].expr.copy(), vars[i].type);
+                vars[i].expr.t = varType;
+            }
+        }
+
         t.transformComplexType(vars[i].type);
         t.transformExpr(vars[i].expr, e, i);
 

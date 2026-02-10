@@ -8,6 +8,8 @@ import haxe.macro.ComplexTypeTools;
 import haxe.macro.Expr;
 import transformer.exprs.*;
 import translator.TranslatorTools;
+import haxe.PosInfos;
+import haxe.CallStack;
 
 /**
  * Transforms Haxe AST to Go ready Haxe AST
@@ -27,7 +29,7 @@ class Transformer {
         p.params.resize(1);
     }
 
-    public function transformExpr(e:HaxeExpr, ?parent:HaxeExpr, ?parentIdx:Int) {
+    public function transformExpr(e:HaxeExpr, ?parent:HaxeExpr, ?parentIdx:Int, ?posInfos: PosInfos) {
         if (e == null || e.def == null) {
             return;
         }
@@ -35,6 +37,14 @@ class Transformer {
         if (parent != null) {
             e.parent = parent;
             e.parentIdx = parentIdx;
+        }
+
+        // e.stck.push(CallStack.callStack());
+
+        if (e.flags & Transformed != 0) {
+            // trace(e.stck.map(cs -> '-->' + cs.join('\n')).join('\n'));
+            // Logging.transformer.error('transformExpr called twice, something has gone *very* wrong! Try building with `-D trace-expr-go` to debug this issue!');
+            return;
         }
 
         switch e.def {
@@ -72,11 +82,13 @@ class Transformer {
             default:
                 iterateExpr(e);
         }
+
+        e.flags |= Transformed;
     }
-    public function iterateExpr(e:HaxeExpr) {
+    public function iterateExpr(e:HaxeExpr, ?posInfos: PosInfos) {
         var idx = 0;
         HaxeExprTools.iter(e, (le) -> {
-            transformExpr(le, e, idx);
+            transformExpr(le, e, idx, posInfos);
             idx++;
         });
     }
@@ -295,6 +307,7 @@ class Transformer {
                             // pass on the params
                             f.params = params;
                             transformer.exprs.Function.transformFunction(this, f, field.name);
+                            continue;
                         default:
                     }
                 default:
