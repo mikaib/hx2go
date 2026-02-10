@@ -6,6 +6,7 @@ import translator.exprs.*;
 import translator.TranslatorTools;
 import HaxeExpr.HaxeTypeDefinition;
 import HaxeExpr.HaxeField;
+import haxe.macro.ComplexTypeTools;
 
 /**
  * Translates Haxe AST to Go AST (strings for now TODO)
@@ -103,10 +104,10 @@ class Translator {
                             throw "expr.def is not EFunction: " + expr.def;
                     }
                 case FVar:
-                    buf.add('var $name'); // TODO: typing
-                    if (expr != null)
-                        buf.add(translateExpr(expr));
-                    buf.add("\n");
+//                    buf.add('var $name'); // TODO: typing
+//                    if (expr != null)
+//                        buf.add(translateExpr(expr));
+//                    buf.add("\n");
                 case FProp(get, set): // TODO: impl
 //                    buf.add('//FPROP\nvar $name');
 //                    if (expr != null)
@@ -216,10 +217,50 @@ class Translator {
         }
 
         buf.add('\tVTable ${className}_VTable\n'); // TODO: add superClass to struct
+
+        var instanceFieldInit:Array<HaxeExpr> = [];
+        for (field in def.fields) {
+            switch field.kind {
+                case FVar: {
+                    buf.add('\t${toPascalCase(field.name)} any\n'); // TODO: typing
+                    if (field.expr != null) {
+                        instanceFieldInit.push({
+                            t: null,
+                            def: EBinop(OpAssign, {
+                                t: field.t,
+                                def: EConst(CIdent(field.name))
+                            }, field.expr)
+                        });
+                    }
+                }
+
+                case _: null;
+            }
+        }
+
         buf.add('}\n\n');
 
-        var prmStr = '';
-        var argStr = '';
+        var prmStr: Array<String> = [];
+        var argStr: Array<String> = [];
+        var constructorStr = '';
+
+        switch constructor?.kind {
+            case FFun(_):
+                switch constructor.expr.def {
+                    case EFunction(kind, f):
+                        module.transformer.transformExpr(constructor.expr);
+                        constructorStr = translator.exprs.Function.translateFunction(this, 'New', f, def, false) + "\n";
+
+                        for (a in f.args) {
+                            prmStr.push('${a.name}${a.type != null ? ' ${translateComplexType(a.type)}' : ''}');
+                            argStr.push(a.name);
+                        }
+                    default:
+                        Logging.translator.error('expr.def failure for constructor');
+                        throw "expr.def is not EFunction: " + constructor.expr.def;
+                }
+            default:
+        }
 
         buf.add('func ${className}_CreateEmptyInstance() *$className {\n');
         buf.add('\tobj := &$className{}\n');
@@ -234,24 +275,14 @@ class Translator {
         buf.add('\treturn obj\n');
         buf.add('}\n\n');
 
-        buf.add('func ${className}_CreateInstance($prmStr) *$className {\n');
+        buf.add('func ${className}_CreateInstance(${prmStr.join(', ')}) *$className {\n');
         buf.add('\tobj := ${className}_CreateEmptyInstance()\n');
-        if (constructor != null) buf.add('\tobj.New()\n');
+        if (constructor != null) buf.add('\tobj.New(${argStr.join(', ')})\n');
         buf.add('\treturn obj\n');
         buf.add('}\n\n');
 
-        switch constructor?.kind {
-            case FFun(_):
-                switch constructor.expr.def {
-                    case EFunction(kind, f):
-                        module.transformer.transformExpr(constructor.expr);
-                        buf.add(translator.exprs.Function.translateFunction(this, 'New', f, def, false) + "\n");
-                    default:
-                        Logging.translator.error('expr.def failure for constructor');
-                        throw "expr.def is not EFunction: " + constructor.expr.def;
-                }
-            default:
-        }
+        buf.add(constructorStr);
+
 
         return buf.toString();
     }
