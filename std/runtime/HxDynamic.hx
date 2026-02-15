@@ -101,7 +101,7 @@ class HxDynamic {
 			return Reflect.Int;
 		else if ((aV.canFloat() || avCi) && (bV.canFloat() || bvCi))
 			return Reflect.Float64;
-		else if (aV.kind() == Reflect.String && bV.kind() == Reflect.String)
+		else if (aV.kind() == Reflect.String || bV.kind() == Reflect.String)
 			return Reflect.String;
 		else
 			Sys.println("throw runtime.HxDynamic.jointKind invalid operands: " + aV.string() + " and " + bV.string());
@@ -137,7 +137,7 @@ class HxDynamic {
 		else if (k == Reflect.Float64)
 			return (valueToFloat(aV) == valueToFloat(bV) : Dynamic);
 		else if (k == Reflect.String)
-			return (aV.string() == bV.string():Dynamic);
+			return ( toString(a) == toString(b):Dynamic);
 		else
 			return (null : Dynamic);
 	}
@@ -155,7 +155,7 @@ class HxDynamic {
 		else if (k == Reflect.Float64)
 			return (valueToFloat(aV) < valueToFloat(bV) : Dynamic);
 		else if (k == Reflect.String)
-			return (aV.string() < bV.string():Dynamic);
+			return (toString(a) < toString(b):Dynamic);
 		else
 			return (null : Dynamic);
 	}
@@ -173,7 +173,7 @@ class HxDynamic {
 		else if (k == Reflect.Float64)
 			return (valueToFloat(aV) > valueToFloat(bV) : Dynamic);
 		else if (k == Reflect.String)
-			return (aV.string() > bV.string():Dynamic);
+			return (toString(a) > toString(b):Dynamic);
 		else
 			return (null : Dynamic);
 	}
@@ -191,7 +191,7 @@ class HxDynamic {
 		else if (k == Reflect.Float64)
 			return (valueToFloat(aV) + valueToFloat(bV) : Dynamic);
 		else if (k == Reflect.String)
-			return (aV.string() + bV.string():Dynamic);
+			return (toString(a) + toString(b):Dynamic);
 		else
 			return (null : Dynamic);
 	}
@@ -307,10 +307,10 @@ class HxDynamic {
 	//
 
 	public static function toString(d:Dynamic):String {
-		var dV = Reflect.valueOf(d);
-		if (dV.kind() == Reflect.String) {
-			return dV.string();
-		}
+		// var dV = Reflect.valueOf(d);
+		// if (dV.kind() == Reflect.String) {
+		// 	return dV.string(); // gives a string showing the type of the value, not a representation of the value
+		// }
 		return Std.string(d);
 	}
 
