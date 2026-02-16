@@ -19,6 +19,7 @@ enum RecordEntryKind {
     REnum;
     RClass;
 }
+
 /**
  * Shared across both Class and Abstract
  */
@@ -32,7 +33,7 @@ class RecordEntry {
     public var _private: Bool = false;
     public var doc: Null<String> = null;
     public var meta: Array<String> = [];
-    public var params: Array<Dynamic> = [];
+    public var params: Array<Map<String, Dynamic>> = [];
     // specialised variants
     public function toClass(): RecordClass return cast (this, RecordClass);
     public function toAbstract(): RecordAbstract return cast (this, RecordAbstract);

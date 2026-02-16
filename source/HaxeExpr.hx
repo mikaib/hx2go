@@ -262,6 +262,7 @@ class HaxeTypeDefinition {
 	public var fields:Array<HaxeField>;
 	public var constructor: HaxeField;
 	public var kind:HaxeTypeDefinitionKind;
+	public var params:Array<TypeParamDecl>;
 	public var superClass: Null<String>;
 	public var usages: Map<String, Int> = []; // origin, count
 	public var buf: StringBuf = new StringBuf();

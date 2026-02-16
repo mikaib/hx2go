@@ -24,7 +24,9 @@ function recordToHaxeTypeDefinition(record: RecordEntry):HaxeTypeDefinition {
 
     var kind:HaxeTypeDefinitionKind = TDClass;
     var fields:Array<HaxeField> = [];
+    var params:Array<TypeParamDecl> = [];
     var isExtern = false;
+
     switch record.record_kind {
         case RClass:
             var cls = record.toClass();
@@ -36,6 +38,7 @@ function recordToHaxeTypeDefinition(record: RecordEntry):HaxeTypeDefinition {
             // TODO: temp fix
             if (cls.ordered_fields == null)
                 cls.ordered_fields = [];
+
             for (field in cls.ordered_fields) {
                 fields.push(recordClassFieldToHaxeField(record.record_debug_path, field, false));
             }
@@ -43,8 +46,16 @@ function recordToHaxeTypeDefinition(record: RecordEntry):HaxeTypeDefinition {
             // TODO: temp fix
             if (cls.ordered_statics == null)
                 cls.ordered_statics = [];
+
             for (field in cls.ordered_statics) {
                 fields.push(recordClassFieldToHaxeField(record.record_debug_path, field, true));
+            }
+
+            if (cls.params == null)
+                cls.params = [];
+
+            for (param in cls.params) {
+                params.push(recordTypeParamToParamDecl(record.record_debug_path, param));
             }
 
         case RAbstract:
@@ -100,7 +111,8 @@ function recordToHaxeTypeDefinition(record: RecordEntry):HaxeTypeDefinition {
         meta: () -> getMeta(record.meta),
         constructor: constructor,
         kind: kind,
-        superClass: superClass
+        superClass: superClass,
+        params: params
     };
 }
 
@@ -113,7 +125,14 @@ private function getMeta(list:Array<String>):Array<MetadataEntry> {
     });
 }
 
+private function recordTypeParamToParamDecl(record_debug_path:String, param: Map<String, Dynamic>): TypeParamDecl {
+    return {
+        name: param["name"],
+    };
+}
+
 private function recordClassFieldToHaxeField(record_debug_path:String, field:RecordClassField, isStatic:Bool):HaxeField {
+    trace(haxe.Json.stringify(field, null, ' '));
     final kind:HaxeFieldKind = switch field.kind {
         case "method", "dynamic method", "inline method":
             final params:Array<TypeParamDecl> = [];

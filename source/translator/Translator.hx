@@ -19,9 +19,11 @@ class Translator {
     public inline function translateComplexType(ct:ComplexType):String {
         return switch ct {
             case TPath(p):
-                if (p.pack.length == 0) {
+                if (p.sub != null) {
+                    p.sub; // TODO: we need to make a distinction between a.T and b.T
+                } else if (p.pack.length == 0) {
                     p.name;
-                }else{
+                } else {
                     p.pack.join(".") + p.name;
                 }
             case TFunction(args, ret):
@@ -130,11 +132,22 @@ class Translator {
         return buf.toString();
     }
 
+    public function translateParamDecl(params: Array<TypeParamDecl>): String {
+        return params.length > 0 ? '[${params.map(p -> '${p.name} any').join(', ')}]' : '';
+    }
+
+    public function translateParamUse(params: Array<TypeParamDecl>): String {
+        return params.length > 0 ? '[${params.map(p -> '${p.name}').join(', ')}]' : '';
+    }
+
     public function translateClassDef(def: HaxeTypeDefinition): String {
         var buf = new StringBuf();
+        var typeParamDeclStr = translateParamDecl(def.params);
+        var typeParamUsageStr = translateParamUse(def.params);
+
         final className = 'Hx_${modulePathToPrefix(def.name)}_Obj';
 
-        buf.add('type ${className}_VTable interface {\n');
+        buf.add('type ${className}_VTable${typeParamDeclStr} interface {\n');
 
         var vTableAssignmentBuf = new StringBuf();
         var superClass = def.superClass;
@@ -142,7 +155,7 @@ class Translator {
         var constructor: HaxeField = def?.constructor;
 
         if (superClass != null) {
-            buf.add('\tHx_${modulePathToPrefix(def.superClass)}_Obj_VTable\n');
+            buf.add('\tHx_${modulePathToPrefix(def.superClass)}_Obj_VTable\n'); // TODO: type params
         }
 
         while (superClass != null) {
@@ -208,21 +221,20 @@ class Translator {
         }
 
         buf.add('}\n\n');
-
-        buf.add('type $className struct {\n');
+        buf.add('type ${className}${typeParamDeclStr} struct {\n');
 
         if (def.superClass != null) {
-            buf.add('\tHx_${modulePathToPrefix(def.superClass)}_Obj\n');
-            buf.add('\tSuper *Hx_${modulePathToPrefix(def.superClass)}_Obj\n');
+            buf.add('\tHx_${modulePathToPrefix(def.superClass)}_Obj\n'); // TODO: type params
+            buf.add('\tSuper *Hx_${modulePathToPrefix(def.superClass)}_Obj\n'); // TODO: type params
         }
 
-        buf.add('\tVTable ${className}_VTable\n'); // TODO: add superClass to struct
+        buf.add('\tVTable ${className}_VTable${typeParamUsageStr}\n'); // TODO: add superClass to struct
 
         var instanceFieldInit:Array<HaxeExpr> = [];
         for (field in def.fields) {
             switch field.kind {
                 case FVar: {
-                    buf.add('\t${toPascalCase(field.name)} any\n'); // TODO: typing
+                    buf.add('\t${toPascalCase(field.name)} any\n'); // TODO: typing and prepend "Hx_"
                     if (field.expr != null) {
                         instanceFieldInit.push({
                             t: null,
@@ -262,8 +274,8 @@ class Translator {
             default:
         }
 
-        buf.add('func ${className}_CreateEmptyInstance() *$className {\n');
-        buf.add('\tobj := &$className{}\n');
+        buf.add('func ${className}_CreateEmptyInstance${typeParamDeclStr}() *${className}${typeParamUsageStr} {\n');
+        buf.add('\tobj := &${className}${typeParamUsageStr}{}\n');
         buf.add('\tobj.VTable = obj\n'); // TODO: also set vtable on the entire hierarchy of super classes
 
         if (def.superClass != null) {
@@ -275,8 +287,8 @@ class Translator {
         buf.add('\treturn obj\n');
         buf.add('}\n\n');
 
-        buf.add('func ${className}_CreateInstance(${prmStr.join(', ')}) *$className {\n');
-        buf.add('\tobj := ${className}_CreateEmptyInstance()\n');
+        buf.add('func ${className}_CreateInstance${typeParamDeclStr}(${prmStr.join(', ')}) *${className}${typeParamUsageStr} {\n');
+        buf.add('\tobj := ${className}_CreateEmptyInstance${typeParamUsageStr}()\n');
         if (constructor != null) buf.add('\tobj.New(${argStr.join(', ')})\n');
         buf.add('\treturn obj\n');
         buf.add('}\n\n');

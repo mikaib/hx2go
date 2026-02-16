@@ -23,7 +23,7 @@ function translateFunction(t:Translator, name:String, f:HaxeFunction, def: HaxeT
     final clsName = 'Hx_' + modulePathToPrefix(def.name) + '_Obj';
 
     return if (isStatic) 'func $name$paramString(${args.join(", ")}) $ret $exprString\n';
-    else 'func (this *$clsName) $name$paramString(${args.join(", ")}) $ret $exprString\n';
+    else 'func (this *${clsName}${t.translateParamUse(def.params)}) $name$paramString(${args.join(", ")}) $ret $exprString\n';
 }
 
 function isVoid(ct:ComplexType) {

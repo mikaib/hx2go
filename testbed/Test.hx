@@ -68,34 +68,20 @@ import go.Fmt;
 //14:05:18:664   Test.hx:65:,100
 // */
 
-//class Ref<T> {
-//
-//    public var value: T;
-//
-//    public function new(_value: T) {
-//        set(_value);
-//    }
-//
-//    public function set(_value: T) {
-//        value = _value;
-//    }
-//
-//    public function get(): T {
-//        return value;
-//    }
-//
-//}
+class Ref<T> {
 
-class Greeter {
+    public var value: T;
 
-    public var name: String;
-
-    public function new(_name: String) {
-        name = _name;
+    public function new(_value: T) {
+        set(_value);
     }
 
-    public function greet(): Void {
-        Fmt.println("Hello,", name);
+    public function set(_value: T) {
+        value = _value;
+    }
+
+    public function get(): T {
+        return value;
     }
 
 }
@@ -104,18 +90,15 @@ class Greeter {
 class Test {
 
     public static function main() {
-//        var x: Ref<Int> = new Ref(3);
-//        Fmt.println(x.get());
-//        x.set(5);
-//        Fmt.println(x.get());
-//        x.set(10);
+        var x: Ref<Int> = new Ref(3);
+        Fmt.println(x.get());
+        x.set(5);
+        Fmt.println(x.get());
+        x.set(10);
 //
 //        var y: Ref<Ref<Int>> = new Ref(x);
 //        Fmt.println(y.get());
 //        Fmt.println(y.get().get());
-
-        var g = new Greeter("Joe");
-        g.greet();
     }
 
 }

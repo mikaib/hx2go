@@ -128,7 +128,10 @@ class Transformer {
                         if (!processTypeMetadata(p, td)) {
                             var clsName = 'Hx_${modulePathToPrefix(td.name)}_Obj';
                             p.pack = [];
-                            p.name = '*$clsName';
+                            p.name = '*${clsName}${p.params.length > 0 ? '[${p.params.map(p -> switch p {
+                                case TPType(TPath(p)): p.name;
+                                case _: '';
+                            }).join(', ')}]' : ""}';
                         }
                     }
                 }
