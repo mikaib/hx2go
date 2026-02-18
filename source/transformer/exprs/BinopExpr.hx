@@ -103,18 +103,6 @@ function promoteBinop(e1:HaxeExpr, e2:HaxeExpr, e:HaxeExpr, op: Binop) {
                 case _: // any other comparison we ignore for now...
             }
         }
-        case TPath({ pack: [], name: "String" }): { // compare
-            // special case
-            if (!typeEq(resultCt, leftCt)) {
-                e1.def = EGoCode("fmt.Sprint({0})", [e1.copy()]);
-                e1.t = e.t; // this will copy over the Null<T> property if it exists, but that doesn't matter
-            }
-
-            if (!typeEq(resultCt, rightCt)) {
-                e2.def = EGoCode("fmt.Sprint({0})", [e2.copy()]);
-                e2.t = e.t; // this will copy over the Null<T> property if it exists, but that doesn't matter
-            }
-        }
         case _: { // generic
             if (!typeEq(resultCt, leftCt)) {
                 e1.def = ECast(e1.copy(), resultCt);
