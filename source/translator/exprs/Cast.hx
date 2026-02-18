@@ -18,7 +18,7 @@ function translateCast(t:Translator, e:HaxeExpr, type:ComplexType) {
     return switch (tStr) {
         case _ if (path != null && tStr.charAt(0) == "*"): '((' + tStr + ')(' + eStr + '))';
         case _ if (path != null && tStr.startsWith('[')): '((' + tStr + ')(' + eStr + '))';
-        case _ if (path == null || path.params.length == 0): tStr + '(' + eStr + ')';
+        case _ if (path == null || (path.params == null || path.params.length == 0)): tStr + '(' + eStr + ')';
         case _: '((' + tStr + ')(' + eStr + '))';
     };
 }

@@ -103,7 +103,6 @@ function promoteBinop(e1:HaxeExpr, e2:HaxeExpr, e:HaxeExpr, op: Binop) {
                 case _: // any other comparison we ignore for now...
             }
         }
-
         case _: { // generic
             if (!typeEq(resultCt, leftCt)) {
                 e1.def = ECast(e1.copy(), resultCt);
