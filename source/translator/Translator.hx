@@ -233,8 +233,11 @@ class Translator {
         var instanceFieldInit:Array<HaxeExpr> = [];
         for (field in def.fields) {
             switch field.kind {
-                case FVar: {
-                    buf.add('\t${toPascalCase(field.name)} any\n'); // TODO: typing and prepend "Hx_"
+                case FVar | FProp("default", _) | FProp(_, "default"): {
+                    final ct = HaxeExprTools.stringToComplexType(field.t);
+                    module.transformer.transformComplexType(ct);
+
+                    buf.add('\t${toPascalCase(field.name)} ${translateComplexType(ct)}\n'); // TODO: typing and prepend "Hx_"
                     if (field.expr != null) {
                         instanceFieldInit.push({
                             t: null,

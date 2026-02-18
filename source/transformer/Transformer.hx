@@ -145,12 +145,8 @@ class Transformer {
             return;
         }
 
-        for (param in params) {
-            switch param {
-                case TPType(t2):
-                    transformComplexType(t2);
-                default:
-            }
+        for (idx in 0...params.length) {
+            transformComplexTypeParam(params, idx);
         }
     }
 
@@ -279,7 +275,7 @@ class Transformer {
             return "any";
         }
 
-        final ct = switch (p) {
+        var ct = switch (p) {
             case TPType(x): x;
             case TPExpr(_): null;
         }
@@ -289,7 +285,16 @@ class Transformer {
             return "any";
         }
 
+        ct = switch ct {
+            case TPath({ name: name, pack: pack, params: params, sub: sub }) if (sub != null):
+                // TODO: track param origin (cl_params, cf_params) and mangle; only if needed: inlining may cause params to collide possibly; requires testing.
+                TPath({ name: sub, pack: [], params: params, sub: null }); // mikaib: pretty nasty, but best way for now...
+
+            case _: ct;
+        }
+
         transformComplexType(ct);
+
         return ComplexTypeTools.toString(ct);
     }
 

@@ -37,8 +37,8 @@ class RecordEntry {
     // specialised variants
     public function toClass(): RecordClass return cast (this, RecordClass);
     public function toAbstract(): RecordAbstract return cast (this, RecordAbstract);
-    public function toType():RecordType return cast (this, RecordType);
-    public function toEnum():RecordEnum return cast (this, RecordEnum);
+    public function toType(): RecordType return cast (this, RecordType);
+    public function toEnum(): RecordEnum return cast (this, RecordEnum);
     public function new() {}
 }
 

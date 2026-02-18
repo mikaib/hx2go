@@ -100,10 +100,11 @@ function processComplexType(t:Transformer, e2:HaxeExpr, ct:ComplexType): { isNat
     }
 
     // this will handle the case if a class tries to call something on itself: it will remove the package path
-    if (!isNative && t.module.path == innerPath.pack.concat([innerPath.name]).join(".")) {
-        renamedIdentLeft = "";
-        topLevel = true;
-    }
+    // mikaib: i think this is legacy code...?
+//    if (!isNative && t.module.path == innerPath.pack.concat([innerPath.name]).join(".")) {
+//        renamedIdentLeft = "";
+//        topLevel = true;
+//    }
 
     if (renamedIdentLeft != "" || topLevel) {
         e2.remapTo = renamedIdentLeft;
@@ -219,10 +220,10 @@ function handleCallTransform(t:Transformer, e:HaxeExpr, params:Array<HaxeExpr>, 
 function handleFieldTransform(t:Transformer, e:HaxeExpr, ct:ComplexType, e2:HaxeExpr, field:String):Bool {
     var transformed = switch ct {
         case TPath({name: "Array", pack: []}) if (field == "length"):
-            e.def = EGoCode('int32(len(*{0}))', [e2]);
+            e.def = EGoCode('len(*{0})', [e2]);
             true;
         case TPath({name: 'String', pack: []}) if(field == "length"):
-            e.def = EGoCode('int32(utf8.RuneCountInString({0}))', [e2]);
+            e.def = EGoCode('utf8.RuneCountInString({0})', [e2]);
             t.def.addGoImport('unicode/utf8');
             true;
         case TAnonymous(fields):

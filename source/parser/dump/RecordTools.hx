@@ -11,6 +11,10 @@ import haxe.macro.Expr.TypeDefKind;
 import haxe.macro.Expr.TypeDefinition;
 import parser.dump.RecordParser;
 import HaxeExpr;
+import haxe.macro.Expr.ComplexType;
+
+using StringTools;
+
 /**
  * Where RecordEntry is turned into a HaxeTypeDefinition
  * @param record
@@ -131,8 +135,94 @@ private function recordTypeParamToParamDecl(record_debug_path:String, param: Map
     };
 }
 
+private function parseAstType(t: String): String {
+    var parseList: String->Array<String> = (s) -> {
+        if (s == null) {
+            return [];
+        }
+
+        s = s.substr(1, s.length - 1);
+
+        var result = [];
+        var buffer = "";
+        var depth = 0;
+
+        for (idx in 0...s.length) {
+            var char = s.charAt(idx);
+
+            buffer += char;
+            switch char {
+                case '[' | '(': depth++;
+                case ']' | ')': depth--;
+                case ',' if (depth == 0):
+                    result.push(buffer.substr(0, buffer.length - 1).trim());
+                    buffer = "";
+                    continue;
+            }
+        }
+
+        if (buffer.endsWith("]")) {
+            buffer = buffer.substr(0, buffer.length - 1);
+        }
+
+        if (buffer.trim() != "") {
+            result.push(buffer.trim());
+        }
+
+        return result;
+    };
+
+    var parseInner: String->String;
+    parseInner = (inner) -> {
+        if (inner == null) {
+            return "#INVALID_AST_TYPE";
+        }
+
+        var parts = inner.split(" ").join("").split("(");
+        var name = parts[0];
+        var inner = parts.slice(1).join("(");
+        inner = "[" + inner.substr(0, inner.length - 1) + "]";
+
+        var elements = parseList(inner);
+
+        return switch (name) {
+            case "TInst" | "TAbstract" | "TEnum" | "TType":
+                var params = parseList(elements[1]);
+                '${elements[0]}${params.length > 0 ? "<" + params.map(q -> parseInner(q)).join(", ") + ">" : ""}';
+
+            case "TMono" | "Some":
+                parseInner(elements[0]);
+
+            case "TFun":
+                var args = parseList(elements[0]);
+                var ret = parseInner(elements[1]);
+                var argStr = 'Void';
+
+                if (args.length > 0) {
+                    argStr = '(' + args.map(q -> {
+                        var parts = q.split(":");
+                        var name = parts.shift();
+                        var type = parseInner(parts.join(":"));
+
+                        return type;
+                    }).join(", ") + ')';
+                }
+
+                '$argStr->$ret';
+
+            case "TDynamic" | "TAnon": // mikaib: i think TAnon is OK like this?
+                "Dynamic";
+
+            case _:
+                Logging.recordParser.warn('unable to parse ast type: "$t" with name "$name"');
+                '#UNKNOWN_AST_TYPE';
+        }
+    }
+
+    return parseInner(t);
+}
+
 private function recordClassFieldToHaxeField(record_debug_path:String, field:RecordClassField, isStatic:Bool):HaxeField {
-    trace(haxe.Json.stringify(field, null, ' '));
     final kind:HaxeFieldKind = switch field.kind {
         case "method", "dynamic method", "inline method":
             final params:Array<TypeParamDecl> = [];
@@ -157,7 +247,7 @@ private function recordClassFieldToHaxeField(record_debug_path:String, field:Rec
     return {
         name: field.name,
         kind: kind,
-        t: "#UNKNOWN_TYPE",
+        t: parseAstType(field.type),
         expr: field.expr,
         meta: getMeta(field.meta),
         isStatic: isStatic
