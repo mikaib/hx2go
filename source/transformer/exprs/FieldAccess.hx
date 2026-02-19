@@ -36,11 +36,17 @@ function transformFieldAccess(t:Transformer, e:HaxeExpr) {
                 case _: false;
             }
 
-            e.def = switch (e?.special) {
-                case FStatic(tstr, _): EConst(CIdent('Hx_${modulePathToPrefix(tstr)}_${field}_Field'));
-                case FInstance(tstr) if (parentIsCall): EField({ t: null, def: EField(e2, 'VTable') }, field, kind);
-                case FInstance(tstr) if (!parentIsCall): EField(e2, field, kind);
-                case _: EField(e2, field, kind);
+            e.def = switch (e2?.def) {
+                case EConst(CIdent("super")):
+                    EField({ t: null, def: EField({ t: null, def: EConst(CIdent("this")) }, "Super", kind)}, field, kind); // t is null, so VTable isn't used (static access)
+
+                case _:
+                    switch (e?.special) {
+                        case FStatic(tstr, _): EConst(CIdent('Hx_${modulePathToPrefix(tstr)}_${field}_Field'));
+                        case FInstance(tstr) if (parentIsCall): EField({ t: null, def: EField(e2, 'VTable') }, field, kind);
+                        case FInstance(tstr) if (!parentIsCall): EField(e2, field, kind);
+                        case _: EField(e2, field, kind);
+                    }
             }
         default:
     }

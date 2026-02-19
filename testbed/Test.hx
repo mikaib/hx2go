@@ -25,6 +25,10 @@ class Car extends Vehicle {
         Sys.println("Car started");
     }
 
+    public function startVehicle(): Void {
+        super.start();
+    }
+
     public function honk(): Void {
         Sys.println("Car honked");
     }
@@ -87,6 +91,7 @@ class Test {
         Sys.println(vehicle.horsepower());
 
         vehicle.start();
+        truck.startVehicle();
 
         Sys.println(truck.horsepower());
         truck.honk();
@@ -134,6 +139,11 @@ class Test {
 
         var greet = new Greeter("Elise");
         greet.greet();
+
+        var buf = new StringBuf();
+        buf.add("Hello, ");
+        buf.add("World!");
+        Fmt.println(buf.toString());
     }
 
 }

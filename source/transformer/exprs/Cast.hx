@@ -37,6 +37,10 @@ function transformCast(t:Transformer, e:HaxeExpr, inner: HaxeExpr, type:ComplexT
         case _: null;
     }
 
+    if (fromPath == null || toPath == null) {
+        return;
+    }
+
     final fromTd = t.module.resolveClass(fromPath.pack, fromPath.name, t.module.path);
     final toTd = t.module.resolveClass(toPath.pack, toPath.name, t.module.path);
     if (fromTd == null || toTd == null) {
