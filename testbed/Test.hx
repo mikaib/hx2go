@@ -64,6 +64,15 @@ class Ref<T> {
 class Test {
 
     public static function main() {
+        var truck: Truck = new Truck();
+        var vehicle: Vehicle = truck;
+        Sys.println(vehicle.horsepower());
+
+        vehicle.start();
+
+        Sys.println(truck.horsepower());
+        truck.honk();
+
         var arr = [1, 2, 3];
         var str = ["a", "b", "c"];
         var arr_iter = new ArrayIterator(arr);
@@ -87,14 +96,12 @@ class Test {
         Fmt.println(y.get());
         Fmt.println(y.get().get());
 
-        var truck: Truck = new Truck();
-        var vehicle: Vehicle = truck;
-        Sys.println(vehicle.horsepower());
+        var refa: Ref<Truck> = new Ref(truck);
+        var refb: Ref<Ref<Truck>> = new Ref(refa);
+        refa.get().honk();
 
-        vehicle.start();
-
-        Sys.println(truck.horsepower());
-        truck.honk();
+        var v: Vehicle = refb.get().get();
+        v.start();
     }
 
 }
