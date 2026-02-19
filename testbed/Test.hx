@@ -60,7 +60,7 @@ class Greeter {
     }
 
     public function greet(): Void {
-        Fmt.println("Hello,", getFullName());
+        Sys.println("Hello, " + getFullName());
     }
 }
 
@@ -111,22 +111,22 @@ class Test {
         var str_iter = new ArrayIterator(str);
 
         for (x in arr_iter) {
-            Fmt.println('iter', x);
+            Sys.println('iter: ' + x);
         }
 
         for (x in str_iter) {
-            Fmt.println('iter', x);
+            Sys.println('iter: ' + x);
         }
 
         var x: Ref<Int> = new Ref(3);
-        Fmt.println(x.get());
+        Sys.println(x.get());
         x.set(5);
-        Fmt.println(x.get());
+        Sys.println(x.get());
         x.set(10);
 
         var y: Ref<Ref<Int>> = new Ref(x);
-        Fmt.println(y.get());
-        Fmt.println(y.get().get());
+        Sys.println(y.get());
+        Sys.println(y.get().get());
 
         var refa: Ref<Truck> = new Ref(truck);
         var refb: Ref<Ref<Truck>> = new Ref(refa);
@@ -136,14 +136,14 @@ class Test {
         v.start();
 
         var cls = HxClass.findClass("Truck");
-        Fmt.println(cls);
-        Fmt.println(cls.superClass);
-        Fmt.println(cls.superClass.superClass);
-        Fmt.println(cls.superClass.superClass.superClass); // should be null
+        Sys.println(cls);
+        Sys.println(cls.superClass);
+        Sys.println(cls.superClass.superClass);
+        Sys.println(cls.superClass.superClass.superClass); // should be null
 
-        Fmt.println("class list:");
+        Sys.println("class list:");
         for (c in HxClass.getAllClasses()) {
-            Fmt.println("  ", c);
+            Sys.println("  " + c);
         }
 
         var greet0 = new Greeter("Elise");
@@ -155,7 +155,7 @@ class Test {
         var buf = new StringBuf();
         buf.add("Hello, ");
         buf.add("World!");
-        Fmt.println(buf.toString());
+        Sys.println(buf.toString());
     }
 
 }

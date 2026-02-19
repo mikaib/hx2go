@@ -3,6 +3,7 @@ package transformer.exprs;
 import haxe.macro.Expr.ComplexType;
 import HaxeExpr.HaxeVar;
 import haxe.macro.ComplexTypeTools;
+import translator.TranslatorTools;
 
 function transformCast(t:Transformer, e:HaxeExpr, inner: HaxeExpr, type:ComplexType) {
     t.transformComplexType(type);
@@ -57,34 +58,6 @@ function transformCast(t:Transformer, e:HaxeExpr, inner: HaxeExpr, type:ComplexT
     }
 
     if (fromTd.kind == toTd.kind && fromTd.kind == TDClass && !hasNative) {
-        var superClass = fromTd.superClass;
-        var target: ComplexType = TPath(toPath);
-        var depth = 1;
-
-        while (superClass != null) {
-            if (superClass == ComplexTypeTools.toString(target)) {
-                break;
-            }
-
-            final sct = HaxeExprTools.stringToComplexType(superClass);
-            final spath = switch sct {
-                case TPath(p): p;
-                case _: null;
-            }
-
-            final smod = t.module.resolveClass(spath.pack, spath.name, t.module.path);
-            superClass = smod.superClass;
-            depth++;
-        }
-
-        if (superClass == null) {
-            Logging.transformer.debug("Unable to process cast, it may be incorrect: " + inner.t + " -> " + e.t);
-            return;
-        }
-
-        e.def = EField(inner.copy(), 'Super');
-        for (idx in 0...depth - 1) {
-            e.def = EField(e.copy(), 'Super');
-        }
+        e.def = EGoCode("(&{0})", [{ t: null, def: EField(inner.copy(), 'Hx_${modulePathToPrefix(toTd.name)}_Obj') }]);
     }
 }
