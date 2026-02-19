@@ -64,6 +64,15 @@ class Greeter {
     }
 }
 
+class LastNameGreeter extends Greeter {
+
+    public function new(firstName: String, lastName: String) {
+        super(firstName);
+        this.lastName = lastName;
+    }
+
+}
+
 class Ref<T> {
 
     public var value: T;
@@ -137,8 +146,11 @@ class Test {
             Fmt.println("  ", c);
         }
 
-        var greet = new Greeter("Elise");
-        greet.greet();
+        var greet0 = new Greeter("Elise");
+        greet0.greet();
+
+        var greet1 = new LastNameGreeter("Bob", "Third");
+        greet1.greet();
 
         var buf = new StringBuf();
         buf.add("Hello, ");

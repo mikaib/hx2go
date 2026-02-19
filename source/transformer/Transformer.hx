@@ -79,6 +79,8 @@ class Transformer {
                 Switch.transformSwitch(this, e, on, cases, def);
             case EGoEnumParameter(e0, kind, idx):
                 transformer.exprs.EnumParameter.transformEnumParameter(this, e, e0, kind, idx);
+            case ECall(e0, params):
+                transformer.exprs.Call.transformCall(this, e, e0, params);
             default:
                 iterateExpr(e);
         }
