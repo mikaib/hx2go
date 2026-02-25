@@ -77,6 +77,7 @@ function recordToHaxeTypeDefinition(record: RecordEntry):HaxeTypeDefinition {
             name: c.get("cf_name"),
             kind: FFun({ args: [], params: params }),
             t: "#UNKNOWN_TYPE",
+            pos: null,
             expr: c.get("cf_expr"),
             meta: getMeta(c.get("cf_meta")),
         };
@@ -127,6 +128,7 @@ private function recordClassFieldToHaxeField(record_debug_path:String, field:Rec
     return {
         name: field.name,
         kind: kind,
+        pos: field.pos,
         t: "#UNKNOWN_TYPE",
         expr: field.expr,
         meta: getMeta(field.meta),
