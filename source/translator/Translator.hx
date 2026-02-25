@@ -107,6 +107,8 @@ class Translator {
                             throw "expr.def is not EFunction: " + expr.def;
                     }
                 case FVar:
+                    if (field.pos != null)
+                        buf.add(commentJumpTo(field.pos));
                     buf.add('var $name'); // TODO: typing
                     if (expr != null)
                         buf.add(translateExpr(expr));
