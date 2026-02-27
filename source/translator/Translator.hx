@@ -108,7 +108,8 @@ class Translator {
                         case EFunction(kind, f):
                             if (field.pos != null)
                                 buf.add(commentJumpTo(field.pos));
-                            buf.add(translator.exprs.Function.translateFunction(this, name, f));
+
+                            buf.add(translator.exprs.Function.translateFunction(this, name, f, def, field.isStatic) + "\n");
                         default:
                             Logging.translator.error('expr.def failure field:' + field.name);
                             throw "expr.def is not EFunction: " + expr.def;

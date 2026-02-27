@@ -346,8 +346,6 @@ class ExprParser {
                     ret: ret,
                 });
                 //objectToExpr(object.objects[object.objects.length - 1]).def;
-            case CONTINUE:
-                EContinue;
             default:
                 //throw "not implemented expr: " + object.def;
                 if (!nonImpl.contains(object.def)) nonImpl.push(object.def);

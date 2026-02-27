@@ -214,6 +214,10 @@ private function parseAstType(t: String): String {
             case "TDynamic" | "TAnon": // mikaib: i think TAnon is OK like this?
                 "Dynamic";
 
+            case "TLazy":
+                Logging.recordParser.warn('TLazy in field type, inside of ast type: "$t"');
+                "Dynamic";
+
             case _:
                 Logging.recordParser.warn('unable to parse ast type: "$t" with name "$name"');
                 '#UNKNOWN_AST_TYPE';
@@ -251,6 +255,7 @@ private function recordClassFieldToHaxeField(record_debug_path:String, field:Rec
         t: parseAstType(field.type),
         expr: field.expr,
         meta: getMeta(field.meta),
-        isStatic: isStatic
+        isStatic: isStatic,
+        pos: field.pos
     };
 }

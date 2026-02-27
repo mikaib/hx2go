@@ -35,14 +35,14 @@ class Semantics {
             case EBinop(OpBoolAnd, e1, e2): // `a && b` -> `(if (a) b else false)`
                 p.def = EIf(
                     {
-                        t: null,
+                        t: "Bool",
                         def: EBinop(OpEq, e1, {
-                            t: null,
+                            t: "Bool",
                             def: EConst(CIdent('true'))
                         })
                     },
                     e2, {
-                        t: null,
+                        t: "Bool",
                         def: EConst(CIdent('false'))
                     }
                 );
@@ -52,14 +52,14 @@ class Semantics {
             case EBinop(OpBoolOr, e1, e2): // `a || b` -> `(if (a) true else b)`
                 p.def = EIf(
                     {
-                        t: null,
+                        t: "Bool",
                         def: EBinop(OpEq, e1, {
-                            t: null,
+                            t: "Bool",
                             def: EConst(CIdent('true'))
                         })
                     },
                     {
-                        t: null,
+                        t: "Bool",
                         def: EConst(CIdent('true'))
                     }, e2
                 );
