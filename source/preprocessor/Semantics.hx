@@ -271,7 +271,7 @@ class Semantics {
 	 */
 	public static function getIntegerSigned(t: ComplexType): Bool {
 		return switch t {
-			case TPath({ pack: [], name: "Int" }) | TPath({ pack: ["go"], name: "GoInt" | "Int8" | "Int16" | "Int32" | "Int64" }): true;
+			case TPath({ pack: [], name: "Int" | "Dynamic" }) | TPath({ pack: ["go"], name: "GoInt" | "Int8" | "Int16" | "Int32" | "Int64" }): true;
 			case TPath({ pack: [], name: "UInt" }) | TPath({ pack: ["go"], name: "GoUInt" | "UInt8" | "UInt16" | "UInt32" | "UInt64" | "Rune" | "Byte" }): false;
 			case _: Logging.preprocessor.error('unrecognised integer type: $t'); true; // abstract should not cause this code path anyway.
 		}
@@ -283,7 +283,7 @@ class Semantics {
 	 */
 	public static function getIntegerWidth(t: ComplexType): Int {
 		return switch t {
-			case TPath({ pack: [], name: "Int" | "UInt" }) | TPath({ pack: ["go"], name: "Int" | "UInt" | "GoInt" | "GoUInt" }): 64; // for GoInt I assume the wider type, i could add special handling but that is extra comlexity for little (to no) gain.
+			case TPath({ pack: [], name: "Int" | "Dynamic" | "UInt" }) | TPath({ pack: ["go"], name: "Int" | "UInt" | "GoInt" | "GoUInt" }): 64; // for GoInt I assume the wider type, i could add special handling but that is extra comlexity for little (to no) gain.
 			case TPath({ pack: ["go"], name: "Int8" | "UInt8" | "Rune" | "Byte" }): 8;
 			case TPath({ pack: ["go"], name: "Int16" | "UInt16" }): 16;
 			case TPath({ pack: ["go"], name: "Int32" | "UInt32" }): 32;

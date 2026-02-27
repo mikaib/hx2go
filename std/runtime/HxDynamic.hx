@@ -150,7 +150,7 @@ class HxDynamic {
 	}
 
 	public static function nequals(a:Dynamic, b:Dynamic):Bool {
-		return not(equals(a, b));
+		return !equals(a, b);
 	}
 
 	public static function lt(a:Dynamic, b:Dynamic):Bool {
@@ -168,7 +168,7 @@ class HxDynamic {
 	}
 
 	public static function gtequals(a:Dynamic, b:Dynamic):Bool {
-		return not(lt(a, b));
+		return !lt(a, b);
 	}
 
 	public static function gt(a:Dynamic, b:Dynamic):Bool {
@@ -186,7 +186,7 @@ class HxDynamic {
 	}
 
 	public static function ltequals(a:Dynamic, b:Dynamic):Bool {
-		return not(gt(a, b));
+		return !gt(a, b);
 	}
 
 	public static function add(a:Dynamic, b:Dynamic):Dynamic {

@@ -200,9 +200,12 @@ function toDynamicOp(left: HaxeExpr, right: HaxeExpr, op: Binop): HaxeExpr {
         case OpShr: "rbitshift";
         case OpUShr: "urbitshift";
         case OpMod: "modulo";
-        case OpAssign, OpAssignOp(_), OpInterval, OpArrow, OpIn, OpNullCoal: Logging.transformer.error("Invalid promoteBinop with Dynamic (toDynamicOp)"); "#ERROR";
+        case OpAssign, OpInterval, OpArrow, OpIn, OpNullCoal: Logging.transformer.error("Invalid promoteBinop with Dynamic (toDynamicOp)"); "#ERROR";
+        case OpAssignOp(innerOp): {
+            return { t: null, def: EBinop(OpAssign, left.copy(), toDynamicOp(left, right, innerOp)) };
+        }
     }
 
-    return { t: null, def: makeHxDynamicCall(funcName, [left.copy(), right.copy()]) };
+    return { t: null, def: makeHxDynamicCall(funcName, [left, right]) };
 }
 
