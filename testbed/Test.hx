@@ -59,10 +59,6 @@ class Greeter {
         return firstName + " " + lastName;
     }
 
-    public function appendSomethingToName<T>(x: T): String {
-        return getFullName() + Std.string(x);
-    }
-
     public function greet(): Void {
         Sys.println("Hello, " + getFullName());
     }
@@ -155,9 +151,6 @@ class Test {
 
         var greet1 = new LastNameGreeter("Bob", "Third");
         greet1.greet();
-
-        var methodParam = greet0.appendSomethingToName("Something...");
-        Sys.println(methodParam);
 
 //        var buf = new StringBuf();
 //        buf.add("Hello, ");

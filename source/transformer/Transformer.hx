@@ -29,7 +29,7 @@ class Transformer {
         p.params.resize(1);
     }
 
-    public function transformExpr(e:HaxeExpr, ?parent:HaxeExpr, ?parentIdx:Int, ?posInfos: PosInfos) {
+    public function transformExpr(e:HaxeExpr, ?parent:HaxeExpr, ?parentIdx:Int) {
         if (e == null || e.def == null) {
             return;
         }
@@ -87,10 +87,10 @@ class Transformer {
 
         e.flags |= Transformed;
     }
-    public function iterateExpr(e:HaxeExpr, ?posInfos: PosInfos) {
+    public function iterateExpr(e:HaxeExpr) {
         var idx = 0;
         HaxeExprTools.iter(e, (le) -> {
-            transformExpr(le, e, idx, posInfos);
+            transformExpr(le, e, idx);
             idx++;
         });
     }

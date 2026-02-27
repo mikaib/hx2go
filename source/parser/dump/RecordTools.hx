@@ -102,7 +102,7 @@ function recordToHaxeTypeDefinition(record: RecordEntry):HaxeTypeDefinition {
 
     if (record.record_kind == RClass) {
         var cls = record.toClass();
-        if (cls._super != null && cls._super.toLowerCase() != "none") {
+        if (cls._super != null && cls._super != "None") {
             superClass = cls._super;
         }
     }

@@ -110,13 +110,6 @@ function processComplexType(t:Transformer, e2:HaxeExpr, ct:ComplexType): { isNat
         }
     }
 
-    // this will handle the case if a class tries to call something on itself: it will remove the package path
-    // mikaib: i think this is legacy code...?
-//    if (!isNative && t.module.path == innerPath.pack.concat([innerPath.name]).join(".")) {
-//        renamedIdentLeft = "";
-//        topLevel = true;
-//    }
-
     if (renamedIdentLeft != "" || topLevel) {
         e2.remapTo = renamedIdentLeft;
     }
