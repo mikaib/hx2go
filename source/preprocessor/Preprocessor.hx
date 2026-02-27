@@ -77,6 +77,10 @@ class Preprocessor {
                             }
                         }
 
+                        if (preferredOrder.length == 0) {
+                            Logging.preprocessor.error('Extern returning tuple must properly define "@:go.Tuple(...)" metadata with field names for ordering, in $e');
+                        }
+
                         handleTuple(e, ct, scope, preferredOrder);
 
                     case TPath(p) if (p.name == "Result" && p.pack[0] == "go"):

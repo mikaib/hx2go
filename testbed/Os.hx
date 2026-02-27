@@ -1,9 +1,8 @@
 package;
 
-import go.Error;
-import go.Tuple;
+import go.Result;
 
 @:go.TypeAccess({name: "os", imports: ["os"]})
 extern class Os {
-    @:go.Tuple("cwd", "err") static function getwd(): Tuple<{ cwd: String, err: Error }>;
+    static function getwd(): Result<String>;
 }
