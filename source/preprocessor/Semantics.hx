@@ -124,12 +124,8 @@ class Semantics {
 		return switch expr.def {
 			case ESwitch(_, _, _), EBlock(_), EVars(_), EWhile(_, _, _), EIf(_, _, _), EReturn(_), EBinop(OpAssignOp(_), _, _), EBinop(OpAssign, _, _),
 				EUnop(OpIncrement, _, _), EUnop(OpDecrement, _, _), EBreak, EContinue, EThrow(_): Stmt;
-			case EConst(_), EField(_, _, _), ECast(_, _), EBinop(_, _, _), EUnop(_, _, _), ENew(_, _), EParenthesis(_): Expr;
-			case EArray(_): Expr;
+			case EGoEnumIndex(_), EGoEnumParameter(_, _, _), EObjectDecl(_), EArrayDecl(_), EFunction(_, _), EArray(_), EConst(_), EField(_, _, _), ECast(_, _), EBinop(_, _, _), EUnop(_, _, _), ENew(_, _), EParenthesis(_): Expr;
 			case ECall(_, _): EitherKind;
-			case EFunction(_, _): Expr;
-			case EArrayDecl(_): Expr;
-			case EObjectDecl(_): Expr;
 			case _:
 				Logging.preprocessor.error('unknown kind for: $expr');
 				EitherKind;
@@ -165,6 +161,23 @@ class Semantics {
 					if (hasSideEffects(ctx, field.expr))
 						return true;
 				false;
+
+			case ESwitch(e, cases, def):
+				if (hasSideEffects(ctx, e)) return true;
+				for (c in cases) {
+					for (e in c.values)
+						if (hasSideEffects(ctx, e))
+							return true;
+
+					if (hasSideEffects(ctx, c.expr))
+						return true;
+				}
+
+				if (def != null && hasSideEffects(ctx, def))
+					return true;
+
+				false;
+
 			case _:
 				Logging.preprocessor.warn('unknown if expr has side effects (safely assuming it does), for: $expr');
 				true;
